@@ -1,7 +1,3 @@
-Certainly! Below is a sample README file content for your Git repository based on the provided HTML/CSS/JS code for the Amazon Bedrock Pricing Calculator:
-
----
-
 # Amazon Bedrock Pricing Calculator
 
 ![Calculator Preview](bedrock_cost_cal_image.png)
