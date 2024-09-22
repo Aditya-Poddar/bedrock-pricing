@@ -42,8 +42,6 @@ Created by Aditya! Before using it, cross-validate the costing.
 - Readme
 - Activity
 
-Stars: 0 stars  
-Watchers: 1 watching  
-Forks: 0 forks  
+
 Releases: No releases published  
 Packages: No packages published  
