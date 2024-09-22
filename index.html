@@ -3,180 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazon Bedrock Pricing Calculator</title>
+    <title>Cost Calculator</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            padding: 20px;
             margin: 0;
-            background-color: #0a0935;
-/*             background: url('bedrock_cost_cal_image.png'); */
-            color: #333;
-            padding: 10px; /* Add padding to prevent overflow */
-            box-sizing: border-box; /* Include padding in element's total width and height */
+            box-sizing: border-box;
+            background-color: #000033;
+            color: #000033;
         }
-        .calculator {
-            border: none;
-            border-radius: 0;
-            padding: 30px; /* Reduce padding */
-            background-color: #62ddc2;
-            box-shadow: none;
-            width: 140%; /* Full width */
-            max-width: 600px;
-        }
-        .calculator h1 {
-            text-align: left;
-            margin-bottom: 10px; /* Reduce margin */
-            color: #0073bb;
-            font-size: 20px; /* Reduce font size */
-        }
-        .form-group {
-            margin-bottom: 10px; /* Reduce margin */
-        }
-        .form-group label, .form-group input {
-            display: block;
-            width: 100%;
-            margin-top: 5px; /* Reduce margin */
-        }
-        .form-group input {
-            font-size: 0.9em; /* Reduce font size */
-            padding: 8px; /* Reduce padding */
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            color: #333;
-        }
-        .calculator button {
-            font-size: 0.9em; /* Reduce font size */
-            padding: 8px; /* Reduce padding */
-            border-radius: 5px;
-            border: none;
-            background-color: #0073bb;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-        }
-        .calculator button:hover {
-            background-color: #005ea6;
-        }
-        .result {
-            margin-top: 15px; /* Reduce margin */
+        h1 {
             text-align: center;
-            font-size: 1.2em; /* Reduce font size */
+            color: #f9f9f9;
+            margin-bottom: 8px;
+            margin-top: 1px;
+        }
+        h3 {
             color: #333;
+            margin-bottom: 10px;
+            text-align: center;
         }
-        .result-details {
-            margin-top: 10px; /* Reduce margin */
-            padding: 8px; /* Reduce padding */
-            border: 1px solid #ccc;
+        input, select, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            border: 1px solid #7dccdc;
             border-radius: 5px;
-            background-color: #f9f9f9;
-            font-size: 0.9em; /* Reduce font size */
-            color: #555;
+            box-sizing: border-box;
         }
-        .error-message {
-            color: red;
-            font-size: 0.7em; /* Reduce font size */
-            margin-top: 5px;
-            display: none;
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #405be3;
+        }
+        #result, #embedResult {
+            font-weight: bold;
+            color: rgb(53, 102, 201);
+            margin-top: 15px;
+        }
+        #result-details, #embedResultDetails {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .calculator-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #81e0dc;
         }
         .error {
-            border: 1px solid red;
+            color: red;
+            font-size: 14px;
         }
-
-        @media (max-width: 600px) {
-            .calculator {
-                width: 100%;
-                margin: 0;
-                box-shadow: none;
-                border: none;
-                padding: 5px; /* Reduce padding */
-            }
-            .form-group input {
-                font-size: 0.8em; /* Smaller font size */
-            }
-            .calculator button {
-                font-size: 0.8em; /* Smaller font size */
-                width: 100%;
-            }
-            .result-details {
-                font-size: 0.8em; /* Smaller font size */
-            }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <h1>Amazon Bedrock Pricing Calculator</h1>
-        <div class="form-group">
-            <label for="inputTokenPrice">Input Token Price Per 1000 Tokens:</label>
-            <input type="text" id="inputTokenPrice" placeholder="Enter Input Token Price" oninput="validateInput(this)" required>
-            <span id="inputTokenPriceError" class="error-message">Please enter a valid number.</span>
-        </div>
-        <div class="form-group">
-            <label for="outputTokenPrice">Output Token Price Per 1000 Tokens:</label>
-            <input type="text" id="outputTokenPrice" placeholder="Enter Output Token Price" oninput="validateInput(this)" required>
-            <span id="outputTokenPriceError" class="error-message">Please enter a valid number.</span>
-        </div>
-        <div class="form-group">
+    <h1>Amazon Bedrock Pricing Calculator</h1>
+
+    <div class="container">
+        <div class="calculator-section">
+            <h3>Text LLM Model Pricing Calculation</h3>
+            <label for="inputTokenPrice">Price per 1000 Input Tokens (in USD):</label>
+            <input type="text" id="inputTokenPrice" placeholder="Enter input token price" oninput="validateInput(this)"><br>
+            <div class="error" id="inputTokenPriceError"></div>
+
+            <label for="outputTokenPrice">Price per 1000 Output Tokens (in USD):</label>
+            <input type="text" id="outputTokenPrice" placeholder="Enter output token price" oninput="validateInput(this)"><br>
+            <div class="error" id="outputTokenPriceError"></div>
+
             <label for="inputTokens">Total No. of Input Tokens Per Request:</label>
-            <input type="text" id="inputTokens" placeholder="Enter Total Input Tokens" oninput="validateInput(this)" required>
-            <span id="inputTokensError" class="error-message">Please enter a valid number.</span>
-        </div>
-        <div class="form-group">
+            <input type="text" id="inputTokens" placeholder="Enter input tokens" oninput="validateInput(this)"><br>
+            <div class="error" id="inputTokensError"></div>
+
             <label for="outputTokens">Total No. of Output Tokens Per Request:</label>
-            <input type="text" id="outputTokens" placeholder="Enter Total Output Tokens" oninput="validateInput(this)" required>
-            <span id="outputTokensError" class="error-message">Please enter a valid number.</span>
+            <input type="text" id="outputTokens" placeholder="Enter output tokens" oninput="validateInput(this)"><br>
+            <div class="error" id="outputTokensError"></div>
+
+            <label for="requestsPerMonth">Total Number of Requests per Month:</label>
+            <input type="text" id="requestsPerMonth" placeholder="Enter requests per month" oninput="validateInput(this)"><br>
+            <div class="error" id="requestsPerMonthError"></div>
+
+            <button onclick="calculateTotalCost()">Calculate Text Model Cost</button>
+
+            <h2 id="result"></h2>
+            <div id="result-details"></div>
+
+            <button id="resetButton" class="hidden" onclick="resetForm()">New Calculation</button><br>
         </div>
-        <div class="form-group">
-            <label for="requestsPerMonth">Total No. of Requests Per Month:</label>
-            <input type="text" id="requestsPerMonth" placeholder="Enter Total Requests Per Month" oninput="validateInput(this)" required>
-            <span id="requestsPerMonthError" class="error-message">Please enter a valid number.</span>
+
+        <div class="calculator-section">
+            <h3>Embedding LLM Model Pricing Calculation</h3>
+            <label for="embedTokenPrice">Price per 1000 Tokens (in USD):</label>
+            <input type="text" id="embedTokenPrice" placeholder="Enter token price" oninput="validateInput(this)"><br>
+            <div class="error" id="embedTokenPriceError"></div>
+
+            <label for="embedType">Select Input Type:</label>
+            <select id="embedType">
+                <option value="gb">Total Data Size in GB</option>
+                <option value="millionTokens">Total Number of Tokens in Million</option>
+                <option value="tokens">Total Number of Tokens</option>
+            </select><br>
+
+            <label for="embedInputValue">Enter Value:</label>
+            <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)"><br>
+            <div class="error" id="embedInputValueError"></div>
+
+            <button onclick="calculateEmbedding()">Calculate Embedding Model Cost</button>
+
+            <h2 id="embedResult"></h2>
+            <div id="embedResultDetails"></div>
+
+            <button id="embedResetButton" class="hidden" onclick="resetEmbedding()">New Calculation</button><br>
         </div>
-        <button onclick="calculate()">Calculate</button>
-        <div class="result" id="result"></div>
-        <div class="result-details" id="result-details"></div>
-        <button id="newCalculationButton" onclick="resetPage()" style="display:none;">New Calculation</button>
     </div>
 
     <script>
         function validateInput(input) {
-            const value = input.value.trim();
-            const errorSpan = input.nextElementSibling;
+            const errorElement = document.getElementById(input.id + 'Error');
+            const value = input.value;
 
-            if (value === '' || isNaN(value)) {
-                errorSpan.style.display = 'block';
-                input.classList.add('error');
-            } else {
-                errorSpan.style.display = 'none';
+            // Regular expression for positive numbers (greater than 0)
+            const positiveNumberRegex = /^(0|[1-9]\d*)(\.\d+)?$/;
+
+            if (value === '' || positiveNumberRegex.test(value)) {
+                errorElement.textContent = "";
                 input.classList.remove('error');
+            } else {
+                errorElement.textContent = "Please enter a positive number.";
+                input.classList.add('error');
             }
+
+            // Ensure input value remains valid
+            input.value = value.replace(/[^0-9.]/g, '');
         }
 
-        function calculate() {
+        function calculateTotalCost() {
             const inputTokenPrice = parseFloat(document.getElementById('inputTokenPrice').value);
             const outputTokenPrice = parseFloat(document.getElementById('outputTokenPrice').value);
             const inputTokens = parseFloat(document.getElementById('inputTokens').value);
             const outputTokens = parseFloat(document.getElementById('outputTokens').value);
             const requestsPerMonth = parseFloat(document.getElementById('requestsPerMonth').value);
 
-            const inputs = [inputTokenPrice, outputTokenPrice, inputTokens, outputTokens, requestsPerMonth];
-            let isValid = true;
-
-            inputs.forEach(input => {
-                if (isNaN(input)) {
-                    isValid = false;
-                    return;
-                }
-            });
-
-            if (!isValid) {
-                document.getElementById('result').innerText = 'Error: Please enter valid numbers for all fields.';
-                document.getElementById('result-details').innerText = '';
+            if (isNaN(inputTokenPrice) || isNaN(outputTokenPrice) || isNaN(inputTokens) || isNaN(outputTokens) || isNaN(requestsPerMonth)) {
+                alert("Please fill out all fields with valid numbers.");
                 return;
             }
 
@@ -184,17 +173,13 @@
             const totalOutputCost = (outputTokenPrice / 1000) * outputTokens * requestsPerMonth;
             const totalCost = totalInputCost + totalOutputCost;
 
-            document.getElementById('result').innerText = 'Total Monthly Cost: $' + totalCost.toFixed(2);
+            document.getElementById('result').textContent = 'Total Monthly Bedrock Cost: $' + totalCost.toFixed(2);
             document.getElementById('result-details').innerHTML =
                 '<p>Monthly Input Token Cost Calculation: (' + inputTokenPrice + ' / 1000) * ' + inputTokens + ' * ' + requestsPerMonth + ' = $' + totalInputCost.toFixed(2) + '</p>' +
                 '<p>Monthly Output Token Cost Calculation: (' + outputTokenPrice + ' / 1000) * ' + outputTokens + ' * ' + requestsPerMonth + ' = $' + totalOutputCost.toFixed(2) + '</p>' +
                 '<p>Total Monthly Bedrock Cost Calculation: ' + "$" + totalInputCost.toFixed(2) + ' + ' + "$" + totalOutputCost.toFixed(2) + ' = $' + totalCost.toFixed(2) + '</p>';
 
-            document.getElementById('newCalculationButton').style.display = 'block';
-        }
-
-        function resetPage() {
-            location.reload();
+            document.getElementById('resetButton').classList.remove('hidden');
         }
 
         function resetForm() {
@@ -203,19 +188,54 @@
             document.getElementById('inputTokens').value = '';
             document.getElementById('outputTokens').value = '';
             document.getElementById('requestsPerMonth').value = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('result-details').innerHTML = '';
+            document.querySelectorAll('.error').forEach(el => el.textContent = '');
+            document.getElementById('resetButton').classList.add('hidden');
+        }
 
-            document.querySelectorAll('.error-message').forEach(error => {
-                error.style.display = 'none';
-            });
+        function calculateEmbedding() {
+            const embedTokenPrice = parseFloat(document.getElementById('embedTokenPrice').value);
+            const embedType = document.getElementById('embedType').value;
+            const embedInputValue = parseFloat(document.getElementById('embedInputValue').value);
 
-            document.querySelectorAll('.error').forEach(input => {
-                input.classList.remove('error');
-            });
+            if (isNaN(embedTokenPrice) || isNaN(embedInputValue)) {
+                alert("Please fill out all fields with valid numbers.");
+                return;
+            }
 
-            document.getElementById('result').innerText = '';
-            document.getElementById('result-details').innerText = '';
-            document.getElementById('newCalculationButton').style.display = 'none';
+            let totalEmbedCost;
+            let calculationDetails = '';
+
+            if (embedType === 'gb') {
+                const totalTokensFromGB = embedInputValue * 161000000; 
+                totalEmbedCost = (embedTokenPrice / 1000) * totalTokensFromGB;
+                calculationDetails = 'Calculation: (' + embedTokenPrice + ' / 1000) * ' + totalTokensFromGB + ' = $' + totalEmbedCost.toFixed(2);
+            } else if (embedType === 'millionTokens') {
+                totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue * 1000000; 
+                calculationDetails = 'Calculation: (' + embedTokenPrice + ' / 1000) * ' + embedInputValue + ' million tokens = $' + totalEmbedCost.toFixed(2);
+            } else if (embedType === 'tokens') {
+                totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue;
+                calculationDetails = 'Calculation: (' + embedTokenPrice + ' / 1000) * ' + embedInputValue + ' tokens = $' + totalEmbedCost.toFixed(2);
+            }
+
+            document.getElementById('embedResult').textContent = 'Total Monthly Embedding Cost: $' + totalEmbedCost.toFixed(2);
+            document.getElementById('embedResultDetails').innerHTML = '<p>' + calculationDetails + '</p>';
+            document.getElementById('embedResetButton').classList.remove('hidden');
+        }
+
+        function resetEmbedding() {
+            document.getElementById('embedTokenPrice').value = '';
+            document.getElementById('embedInputValue').value = '';
+            document.getElementById('embedResult').textContent = '';
+            document.getElementById('embedResultDetails').innerHTML = '';
+            document.querySelectorAll('.error').forEach(el => el.textContent = '');
+            document.getElementById('embedResetButton').classList.add('hidden');
         }
     </script>
+
+    <div style="text-align: center; margin-top: 20px; color: #e5eceb; padding: 10px;">
+        <p>Developed by Aditya. Please verify cost estimates prior to implementation.</p>
+    </div>
 </body>
 </html>
