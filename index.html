@@ -206,7 +206,7 @@
     <script>
         const pricingData = {
             "Regions": {
-                "N. Virginia (us-east-1)": {
+                "US East 1 (N. Virginia)": {
                 "Providers": {
                     "AI21 Labs": {
                     "Models": {
@@ -280,6 +280,26 @@
                         }
                     }
                     },
+                    "Cohere": {
+                    "Models": {
+                        "Command": {
+                        "Cost per 1000 input tokens": "$0.0015",
+                        "Cost per 1000 output tokens": "$0.0020"
+                        },
+                        "Command-Light": {
+                        "Cost per 1000 input tokens": "$0.0003",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Command R+": {
+                        "Cost per 1000 input tokens": "$0.0030",
+                        "Cost per 1000 output tokens": "$0.0150"
+                        },
+                        "Command R": {
+                        "Cost per 1000 input tokens": "$0.0005",
+                        "Cost per 1000 output tokens": "$0.0015"
+                        }
+                    }
+                    },
                     "Meta Llama 3.2": {
                     "Models": {
                         "Llama 3.2 Instruct (1B)": {
@@ -346,7 +366,7 @@
                     }
                 }
                 },
-                "Oregon (us-west-2)": {
+                "US West 2 (Oregon)": {
                 "Providers": {
                     "Amazon": {
                     "Models": {
@@ -389,6 +409,26 @@
                         "Claude Instant": {
                         "Cost per 1000 input tokens": "$0.0008",
                         "Cost per 1000 output tokens": "$0.0024"
+                        }
+                    }
+                    },
+                    "Cohere": {
+                    "Models": {
+                        "Command": {
+                        "Cost per 1000 input tokens": "$0.0015",
+                        "Cost per 1000 output tokens": "$0.0020"
+                        },
+                        "Command-Light": {
+                        "Cost per 1000 input tokens": "$0.0003",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Command R+": {
+                        "Cost per 1000 input tokens": "$0.0030",
+                        "Cost per 1000 output tokens": "$0.0150"
+                        },
+                        "Command R": {
+                        "Cost per 1000 input tokens": "$0.0005",
+                        "Cost per 1000 output tokens": "$0.0015"
                         }
                     }
                     },
@@ -475,7 +515,7 @@
 
                 }
                 },
-                "Mumbai (ap-south-1)": {
+                "Asia Pacific (Mumbai)": {
                 "Providers": {
                     "Amazon": {
                     "Models": {
@@ -534,8 +574,7 @@
             }
             };
 
-                       
-
+       
         function validateInput(input) {
             const errorElement = document.getElementById(input.id + 'Error');
             const value = input.value;
