@@ -179,9 +179,18 @@
 
         <div class="calculator-section">
             <h3>Embedding Based LLM Model Pricing Calculation</h3>
-            <label for="embedTokenPrice">Price per 1000 Tokens (in USD):</label>
+            <!-- <label for="embedTokenPrice">Price per 1000 Tokens (in USD):</label>
             <input type="text" id="embedTokenPrice" placeholder="Enter token price" oninput="validateInput(this)"><br>
-            <div class="error" id="embedTokenPriceError"></div>
+            <div class="error" id="embedTokenPriceError"></div> -->
+
+
+            <label for="modelType">Select Embedding Model:</label>
+            <select id="modelType">
+                <option value="amzonEv1">Amazon Titan Text Embedding</option>
+                <option value="amzonEv2">Amazon Titan Text Embedding V2</option>
+                <option value="CoherePlain">Cohere Embed English</option>
+                <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
+            </select><br>
 
             <label for="embedType">Select Input Type:</label>
             <select id="embedType">
@@ -729,14 +738,40 @@
 
         // Keep existing embedding calculator functions
         function calculateEmbedding() {
-            const embedTokenPrice = parseFloat(document.getElementById('embedTokenPrice').value);
+            // const embedTokenPrice = parseFloat(document.getElementById('embedTokenPrice').value);
             const embedType = document.getElementById('embedType').value;
+            const modelType = document.getElementById('modelType').value;
             const embedInputValue = parseFloat(document.getElementById('embedInputValue').value);
 
-            if (isNaN(embedTokenPrice) || isNaN(embedInputValue)) {
-                alert("Please fill out all fields with valid numbers.");
+            // <select id="modelType">
+            //     <option value="amzonEv1">Amazon Titan Text Embedding</option>
+            //     <option value="amzonEv1">Amazon Titan Text Embedding V2</option>
+            //     <option value="CoherePlain">Cohere Embed English</option>
+            //     <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
+            // </select><br>
+            
+
+            // if (isNaN(embedTokenPrice) || isNaN(embedInputValue)) {
+            //     alert("Please fill out all fields with valid numbers.");
+            //     return;
+            // }
+
+            let embedTokenPrice;
+
+            // Set embedTokenPrice based on modelType
+            if (modelType === "amzonEv1") {
+                embedTokenPrice = 0.0001; // Amazon Titan Text Embedding price
+            } else if (modelType === "amzonEv2") {
+                embedTokenPrice = 0.00002; // Amazon Titan Text Embedding V2 price
+            } else if (modelType === "CoherePlain") {
+                embedTokenPrice = 0.0001; // Cohere Embed English price
+            } else if (modelType === "CohereMultiLingual") {
+                embedTokenPrice = 0.0001; // Cohere Embed Multilingual price
+            } else {
+                alert("Invalid model type selected.");
                 return;
             }
+
 
             let totalEmbedCost;
             let calculationDetails = '';
@@ -759,7 +794,7 @@
         }
 
         function resetEmbedding() {
-            document.getElementById('embedTokenPrice').value = '';
+            // document.getElementById('embedTokenPrice').value = '';
             document.getElementById('embedInputValue').value = '';
             document.getElementById('embedResult').textContent = '';
             document.getElementById('embedResultDetails').innerHTML = '';
