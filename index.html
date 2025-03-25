@@ -3,216 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost Calculator</title>
+    <title>Amazon Bedrock Cost Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --background-color: #dae1e4;
+            --card-color: #eac3c3;
+            --text-color: #333;
+            --border-color: #aa9e9e;
+            --hover-color: #185abc;
+            --error-color: #ea4335;
+        }
+
+        * {
             margin: 0;
-            box-sizing: border-box;
-            background-color: #000033;
-            color: #000033;
-        }
-        h1 {
-            text-align: center;
-            color: #f9f9f9;
-            margin-bottom: 8px;
-            margin-top: 1px;
-        }
-        h3 {
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        input, select, button {
-            margin: 10px 0;
-            padding: 10px;
-            width: 100%;
-            font-size: 16px;
-            border: 1px solid #7dccdc;
-            border-radius: 5px;
+            padding: 0;
             box-sizing: border-box;
         }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #405be3;
-        }
-        #result, #embedResult {
-            font-weight: bold;
-            color: rgb(53, 102, 201);
-            margin-top: 15px;
-        }
-        #result-details, #embedResultDetails {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .container {
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .calculator-section {
-            flex: 1;
-            min-width: 300px;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #81e0dc;
         }
-        .error {
-            color: red;
-            font-size: 14px;
+
+        .calculator-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--card-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        .hidden {
+
+        .tab-buttons {
+            display: flex;
+            background-color: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .calculator-title {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .input-group .error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 5px;
             display: none;
         }
-        .dropdown-row {
+
+        .input-group input.error,
+        .input-group select.error {
+            border-color: var(--error-color);
+        }
+
+        .input-group input.error + .error,
+        .input-group select.error + .error {
+            display: block;
+        }
+
+        .button-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-top: 20px;
         }
-        /* .dropdown-row select {
+
+        .btn {
             flex: 1;
-        } */
-        .dropdown-row {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-calculate {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background-color: var(--hover-color);
+        }
+
+        .btn-reset {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #c5221f;
+        }
+
+        .results-container {
+            background-color: var(--background-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .result-item {
             display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
         }
-        .dropdown-row select {
-            flex: 1;
-            margin: 0;
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
         }
-        .dropdown-row span {
-            white-space: nowrap;
-            color: #000033;
+
+        .detailed-breakdown {
+            margin-top: 10px;
+            background-color: var(--card-color);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .detailed-step {
+            margin-bottom: 15px;
+        }
+
+        .detailed-step h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .tab-buttons {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                border-bottom: none;
+                border-right: 3px solid transparent;
+            }
+
+            .tab-button.active {
+                border-bottom: none;
+                border-right-color: var(--primary-color);
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Amazon Bedrock Pricing Calculator</h1>
+    <div class="calculator-container">
+        <div class="tab-buttons">
+            <div class="tab-button active" onclick="switchTab('text-model')">Text Model Cost</div>
+            <div class="tab-button" onclick="switchTab('embedding')">Embedding Cost</div>
+            <div class="tab-button" onclick="switchTab('guardrails')">Guardrails Cost</div>
+        </div>
 
-    <div class="container">
-        <div class="calculator-section">
-            <h3>Text Based LLM Model On-Demand Pricing Calculation</h3>
-            
-            <!-- <div class="dropdown-row">
+        <!-- Text Model Cost Calculator -->
+        <div id="text-model-tab" class="tab-content active">
+            <h1 class="calculator-title">Text Based LLM Model Pricing Calculation</h1>
+
+            <div class="input-group">
+                <label>Region</label>
                 <select id="regionSelect" onchange="updateProviders()">
                     <option value="">Select Region</option>
                 </select>
+                <div class="error">Please select a region</div>
+            </div>
+
+            <div class="input-group">
+                <label>Provider</label>
                 <select id="providerSelect" onchange="updateModels()" disabled>
                     <option value="">Select Provider</option>
                 </select>
+                <div class="error">Please select a provider</div>
+            </div>
+
+            <div class="input-group">
+                <label>Model</label>
                 <select id="modelSelect" onchange="updatePricing()" disabled>
                     <option value="">Select Model</option>
                 </select>
-            </div> -->
-
-            <!-- <div class="dropdown-row">
-                <div style="flex: 1;">
-                    <label for="regionSelect">Region:</label>
-                    <select id="regionSelect" onchange="updateProviders()">
-                        <option value="">Select Region</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label for="providerSelect">Model Provider:</label>
-                    <select id="providerSelect" onchange="updateModels()" disabled>
-                        <option value="">Select Model Provider</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label for="modelSelect">Model:</label>
-                    <select id="modelSelect" onchange="updatePricing()" disabled>
-                        <option value="">Select Model</option>
-                    </select>
-                </div>
-            </div> -->
-
-            <div class="dropdown-row">
-                <span style="margin-right: 5px;">Region:</span>
-                <select id="regionSelect" onchange="updateProviders()">
-                    <option value="">Select Region</option>
-                </select>
-                <span style="margin: 0 5px;">Provider:</span>
-                <select id="providerSelect" onchange="updateModels()" disabled>
-                    <option value="">Select Provider</option>
-                </select>
-                <span style="margin: 0 5px;">Model:</span>
-                <select id="modelSelect" onchange="updatePricing()" disabled>
-                    <option value="">Select Model</option>
-                </select>
+                <div class="error">Please select a model</div>
             </div>
 
             <input type="hidden" id="inputTokenPrice">
             <input type="hidden" id="outputTokenPrice">
 
-            <label for="inputTokens">Total No. of Input Tokens Per Request:</label>
-            <input type="text" id="inputTokens" placeholder="Enter input tokens" oninput="validateInput(this)"><br>
-            <div class="error" id="inputTokensError"></div>
+            <div class="input-group">
+                <label>Total No. of Input Tokens Per Request</label>
+                <input type="text" id="textInputTokens" placeholder="Enter input tokens" oninput="validateInput(this)">
+                <div class="error" id="textInputTokensError"></div>
+            </div>
 
-            <label for="outputTokens">Total No. of Output Tokens Per Request:</label>
-            <input type="text" id="outputTokens" placeholder="Enter output tokens" oninput="validateInput(this)"><br>
-            <div class="error" id="outputTokensError"></div>
+            <div class="input-group">
+                <label>Total No. of Output Tokens Per Request</label>
+                <input type="text" id="textOutputTokens" placeholder="Enter output tokens" oninput="validateInput(this)">
+                <div class="error" id="textOutputTokensError"></div>
+            </div>
 
-            <label for="requestsPerMonth">Total Number of Requests per Month:</label>
-            <input type="text" id="requestsPerMonth" placeholder="Enter requests per month" oninput="validateInput(this)"><br>
-            <div class="error" id="requestsPerMonthError"></div>
+            <div class="input-group">
+                <label>Total Number of Requests per Month</label>
+                <input type="text" id="requestsPerMonth" placeholder="Enter requests per month" oninput="validateInput(this)">
+                <div class="error" id="requestsPerMonthError"></div>
+            </div>
 
-            <button onclick="calculateTotalCost()">Calculate Text Model Cost</button>
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateTextModelCost()">Calculate Text Model Cost</button>
+                <button class="btn btn-reset" onclick="resetTextModelCalculator()">Reset</button>
+            </div>
 
-            <h2 id="result"></h2>
-            <div id="result-details"></div>
-
-            <button id="resetButton" class="hidden" onclick="resetForm()">New Calculation</button><br>
+            <div id="text-model-result" class="results-container"></div>
+            <div id="text-model-result-details" class="detailed-breakdown"></div>
         </div>
 
-        <div class="calculator-section">
-            <h3>Embedding Based LLM Model On-Demand Pricing Pricing Calculation</h3>
-            <!-- <label for="embedTokenPrice">Price per 1000 Tokens (in USD):</label>
-            <input type="text" id="embedTokenPrice" placeholder="Enter token price" oninput="validateInput(this)"><br>
-            <div class="error" id="embedTokenPriceError"></div> -->
+        <!-- Embedding Model Cost Calculator -->
+        <div id="embedding-tab" class="tab-content">
+            <h1 class="calculator-title">Embedding Based LLM Model Pricing Calculation</h1>
 
+            <div class="input-group">
+                <label>Select Embedding Model</label>
+                <select id="modelType">
+                    <option value="amzonEv1">Amazon Titan Text Embedding v1</option>
+                    <option value="amzonEv2">Amazon Titan Text Embedding v2</option>
+                    <option value="CoherePlain">Cohere Embed English</option>
+                    <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
+                </select>
+            </div>
 
-            <label for="modelType">Select Embedding Model:</label>
-            <select id="modelType">
-                <option value="amzonEv1">Amazon Titan Text Embedding</option>
-                <option value="amzonEv2">Amazon Titan Text Embedding V2</option>
-                <option value="CoherePlain">Cohere Embed English</option>
-                <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
-            </select><br>
+            <div class="input-group">
+                <label>Select Input Type</label>
+                <select id="embedType">
+                    <option value="gb">Total Data Size in GB</option>
+                    <option value="millionTokens">Total Number of Tokens in Million</option>
+                    <option value="tokens">Total Number of Tokens</option>
+                </select>
+            </div>
 
-            <label for="embedType">Select Input Type:</label>
-            <select id="embedType">
-                <option value="gb">Total Data Size in GB</option>
-                <option value="millionTokens">Total Number of Tokens in Million</option>
-                <option value="tokens">Total Number of Tokens</option>
-            </select><br>
+            <div class="input-group">
+                <label>Enter Value</label>
+                <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)">
+                <div class="error" id="embedInputValueError"></div>
+            </div>
 
-            <label for="embedInputValue">Enter Value:</label>
-            <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)"><br>
-            <div class="error" id="embedInputValueError"></div>
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateEmbeddingCost()">Calculate Embedding Model Cost</button>
+                <button class="btn btn-reset" onclick="resetEmbeddingCalculator()">Reset</button>
+            </div>
 
-            <button onclick="calculateEmbedding()">Calculate Embedding Model Cost</button>
-
-            <h2 id="embedResult"></h2>
-            <div id="embedResultDetails"></div>
-
-            <button id="embedResetButton" class="hidden" onclick="resetEmbedding()">New Calculation</button><br>
+            <div id="embedding-result" class="results-container"></div>
+            <div id="embedding-result-details" class="detailed-breakdown"></div>
         </div>
+
+        <!-- Guardrails Cost Calculator -->
+        <div id="guardrails-tab" class="tab-content">
+            <h1 class="calculator-title">Amazon Bedrock Guardrails Cost Calculator</h1>
+            
+            <div class="input-group">
+                <label for="inputTokens">Input Tokens Per Request</label>
+                <input type="number" id="inputTokens" placeholder="Enter input tokens" min="1">
+                <div class="error">Please enter a positive integer</div>
+            </div>
+
+            <div class="input-group">
+                <label for="outputTokens">Output Tokens Per Request</label>
+                <input type="number" id="outputTokens" placeholder="Enter output tokens" min="1">
+                <div class="error">Please enter a positive integer</div>
+            </div>
+
+            <div class="input-group">
+                <label for="requests">Total Number of Requests Per Month</label>
+                <input type="number" id="requests" placeholder="Enter requests per hour" min="1">
+                <div class="error">Please enter a positive integer</div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateGuardrailsCost()">Calculate Cost</button>
+                <button class="btn btn-reset" onclick="resetGuardrailsCalculator()">Reset</button>
+            </div>
+
+            <div id="guardrails-results" class="results-container"></div>
+            <div id="guardrails-detailed-breakdown" class="detailed-breakdown" style="display:none;"></div>
+        </div>
+
     </div>
 
     <script>
+        // Tab Switching Function
+        function switchTab(tabName) {
+            // Remove active class from all tabs and tab buttons
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Add active class to selected tab and tab button
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Validation Function
+        function validateInput(input) {
+            const errorElement = document.getElementById(input.id + 'Error');
+            const value = input.value;
+            const positiveNumberRegex = /^(0|[1-9]\d*)(\.\d+)?$/;
+
+            if (value === '' || positiveNumberRegex.test(value)) {
+                errorElement.textContent = "";
+                input.classList.remove('error');
+            } else {
+                errorElement.textContent = "Please enter a positive number.";
+                input.classList.add('error');
+            }
+            input.value = value.replace(/[^0-9.]/g, '');
+        }
+        
+
+        // Rest of the JavaScript remains the same as in the previous implementation
+        // (Guardrails, Text Model, and Embedding Cost Calculator functions)
+        // Copy the rest of the script from the previous implementation
+        // Existing functions like calculateGuardrailsCost(), resetGuardrailsCalculator(), etc.
+        
+        // Pricing data object and other existing functions
         const pricingData = {
             "Regions": {
                 "US East 1 (N. Virginia)": {
@@ -992,22 +1173,7 @@
             }
             };
 
-       
-        function validateInput(input) {
-            const errorElement = document.getElementById(input.id + 'Error');
-            const value = input.value;
-            const positiveNumberRegex = /^(0|[1-9]\d*)(\.\d+)?$/;
-
-            if (value === '' || positiveNumberRegex.test(value)) {
-                errorElement.textContent = "";
-                input.classList.remove('error');
-            } else {
-                errorElement.textContent = "Please enter a positive number.";
-                input.classList.add('error');
-            }
-            input.value = value.replace(/[^0-9.]/g, '');
-        }
-
+        // Copy the existing initializeDropdowns, updateProviders, updateModels, updatePricing functions
         function initializeDropdowns() {
             const regionSelect = document.getElementById('regionSelect');
             regionSelect.innerHTML = '<option value="">Select Region</option>';
@@ -1054,12 +1220,10 @@
                 const models = Object.keys(pricingData.Regions[regionSelect.value]
                     .Providers[providerSelect.value].Models);
                 models.forEach(model => {
-                    if (!model.includes("Image Generator")) { // Skip image generator models
-                        const option = document.createElement('option');
-                        option.value = model;
-                        option.textContent = model;
-                        modelSelect.appendChild(option);
-                    }
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
                 });
                 modelSelect.disabled = false;
             } else {
@@ -1084,86 +1248,243 @@
             }
         }
 
-        function calculateTotalCost() {
+        // Remaining functions from the previous implementation
+        // (calculateGuardrailsCost, resetGuardrailsCalculator, 
+        //  calculateTextModelCost, resetTextModelCalculator,
+        //  calculateEmbeddingCost, resetEmbeddingCalculator)
+
+        function calculateGuardrailsCost() {
+            let inputTokens = parseInt(document.getElementById("inputTokens").value);
+            let outputTokens = parseInt(document.getElementById("outputTokens").value);
+            let requests = parseInt(document.getElementById("requests").value);
+            
+            // Validation
+            let hasError = false;
+            const inputTokensEl = document.getElementById("inputTokens");
+            const outputTokensEl = document.getElementById("outputTokens");
+            const requestsEl = document.getElementById("requests");
+
+            if (isNaN(inputTokens) || inputTokens < 1) {
+                inputTokensEl.classList.add('error');
+                inputTokensEl.nextElementSibling.textContent = "Please enter a positive integer";
+                hasError = true;
+            } else {
+                inputTokensEl.classList.remove('error');
+                inputTokensEl.nextElementSibling.textContent = "";
+            }
+
+            if (isNaN(outputTokens) || outputTokens < 1) {
+                outputTokensEl.classList.add('error');
+                outputTokensEl.nextElementSibling.textContent = "Please enter a positive integer";
+                hasError = true;
+            } else {
+                outputTokensEl.classList.remove('error');
+                outputTokensEl.nextElementSibling.textContent = "";
+            }
+
+            if (isNaN(requests) || requests < 1) {
+                requestsEl.classList.add('error');
+                requestsEl.nextElementSibling.textContent = "Please enter a positive integer";
+                hasError = true;
+            } else {
+                requestsEl.classList.remove('error');
+                requestsEl.nextElementSibling.textContent = "";
+            }
+
+            if (hasError) return;
+
+            let inputCharacters = inputTokens * 3.5;
+            let outputCharacters = outputTokens * 3.5;
+
+            let inputUnits = Math.ceil(inputCharacters / 1000);
+            let outputUnits = Math.ceil(outputCharacters / 1000);
+            let totalUnitsPerRequest = inputUnits + outputUnits;
+            let totalUnits = totalUnitsPerRequest * requests;
+
+            let contentFilterCost = (totalUnits * 0.15) / 1000;
+            let deniedTopicsCost = (totalUnits * 0.15) / 1000;
+            let contextualGroundingCost = (totalUnits * 0.1) / 1000;
+            let piiFilterCost = (totalUnits * 0.1) / 1000;
+            let totalCost = contentFilterCost + deniedTopicsCost + contextualGroundingCost + piiFilterCost;
+
+            document.getElementById("guardrails-results").innerHTML = `
+                <div class="result-item">
+                    <span>Content Filter Cost</span>
+                    <span>${contentFilterCost.toFixed(2)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Denied Topics Cost</span>
+                    <span>${deniedTopicsCost.toFixed(2)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Contextual Grounding Cost</span>
+                    <span>${contextualGroundingCost.toFixed(2)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>PII Filter Cost</span>
+                    <span>${piiFilterCost.toFixed(2)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Regex Filter Cost</span>
+                    <span>Free</span>
+                </div>
+                <div class="result-item">
+                    <span>Word Filter Cost</span>
+                    <span>Free</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Cost</span>
+                    <span>${totalCost.toFixed(2)} USD</span>
+                </div>
+            `;
+
+            document.getElementById("guardrails-detailed-breakdown").innerHTML = `
+                <div class="detailed-step">
+                    <h3>Step 1: Token to Character Conversion</h3>
+                    <p>Input Tokens Per Request: ${inputTokens} tokens × 3.5 = ${inputCharacters.toFixed(2)} characters</p>
+                    <p>Output Tokens Per Response: ${outputTokens} tokens × 3.5 = ${outputCharacters.toFixed(2)} characters</p>
+                </div>
+
+                <div class="detailed-step">
+                    <h3>Step 2: Units Calculation</h3>
+                    <p>Input Units Per Request: ${inputCharacters.toFixed(2)} characters ÷ 1000 = ${inputUnits} units (rounded up)</p>
+                    <p>Output Units Per Response: ${outputCharacters.toFixed(2)} characters ÷ 1000 = ${outputUnits} units (rounded up)</p>
+                    <p>Total Units: ${inputUnits} + ${outputUnits} = ${totalUnitsPerRequest} units</p>
+                    <p>Total Units per Month: ${totalUnitsPerRequest} units × ${requests} requests = ${totalUnits} units</p>
+                </div>
+
+                <div class="detailed-step">
+                    <h3>Step 3: Cost Calculation</h3>
+                    <p>Content Filter: ${totalUnits} units × $0.15 per 1000 units = ${contentFilterCost.toFixed(2)} USD</p>
+                    <p>Denied Topics: ${totalUnits} units × $0.15 per 1000 units = ${deniedTopicsCost.toFixed(2)} USD</p>
+                    <p>Contextual Grounding: ${totalUnits} units × $0.10 per 1000 units = ${contextualGroundingCost.toFixed(2)} USD</p>
+                    <p>PII Filter: ${totalUnits} units × $0.10 per 1000 units = ${piiFilterCost.toFixed(2)} USD</p>
+                </div>
+            `;
+
+            document.getElementById("guardrails-detailed-breakdown").style.display = "block";
+        }
+
+        function resetGuardrailsCalculator() {
+            document.getElementById("inputTokens").value = "";
+            document.getElementById("outputTokens").value = "";
+            document.getElementById("requests").value = "";
+            
+            // Remove error classes and messages
+            ["inputTokens", "outputTokens", "requests"].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('error');
+                el.nextElementSibling.textContent = "";
+            });
+
+            document.getElementById("guardrails-results").innerHTML = "";
+            document.getElementById("guardrails-detailed-breakdown").innerHTML = "";
+            document.getElementById("guardrails-detailed-breakdown").style.display = "none";
+        }
+
+        // Implement similar validation and error handling for other calculators
+        function calculateTextModelCost() {
             if (!document.getElementById('modelSelect').value) {
                 alert("Please select a model first.");
                 return;
             }
 
-            const inputTokens = parseFloat(document.getElementById('inputTokens').value);
-            const outputTokens = parseFloat(document.getElementById('outputTokens').value);
+            const inputTokens = parseFloat(document.getElementById('textInputTokens').value);
+            const outputTokens = parseFloat(document.getElementById('textOutputTokens').value);
             const requestsPerMonth = parseFloat(document.getElementById('requestsPerMonth').value);
             const inputTokenPrice = parseFloat(document.getElementById('inputTokenPrice').value);
             const outputTokenPrice = parseFloat(document.getElementById('outputTokenPrice').value);
 
-            if (isNaN(inputTokens) || isNaN(outputTokens) || isNaN(requestsPerMonth)) {
-                alert("Please fill out all fields with valid numbers.");
-                return;
+            // Validation
+            let hasError = false;
+            const inputTokensEl = document.getElementById('textInputTokens');
+            const outputTokensEl = document.getElementById('textOutputTokens');
+            const requestsPerMonthEl = document.getElementById('requestsPerMonth');
+
+            if (isNaN(inputTokens) || inputTokens <= 0) {
+                inputTokensEl.classList.add('error');
+                document.getElementById('textInputTokensError').textContent = "Please enter a positive number";
+                hasError = true;
+            } else {
+                inputTokensEl.classList.remove('error');
+                document.getElementById('textInputTokensError').textContent = "";
             }
+
+            if (isNaN(outputTokens) || outputTokens <= 0) {
+                outputTokensEl.classList.add('error');
+                document.getElementById('textOutputTokensError').textContent = "Please enter a positive number";
+                hasError = true;
+            } else {
+                outputTokensEl.classList.remove('error');
+                document.getElementById('textOutputTokensError').textContent = "";
+            }
+
+            if (isNaN(requestsPerMonth) || requestsPerMonth <= 0) {
+                requestsPerMonthEl.classList.add('error');
+                document.getElementById('requestsPerMonthError').textContent = "Please enter a positive number";
+                hasError = true;
+            } else {
+                requestsPerMonthEl.classList.remove('error');
+                document.getElementById('requestsPerMonthError').textContent = "";
+            }
+
+            if (hasError) return;
 
             const totalInputCost = (inputTokenPrice / 1000) * inputTokens * requestsPerMonth;
             const totalOutputCost = (outputTokenPrice / 1000) * outputTokens * requestsPerMonth;
             const totalCost = totalInputCost + totalOutputCost;
 
-            // const selectedModel = document.getElementById('modelSelect').value;
-            // document.getElementById('result').textContent = 'Total Monthly Bedrock Cost: $' + totalCost.toFixed(2);
-            // document.getElementById('result-details').innerHTML = `
-            //     <p>Selected Model: ${selectedModel}</p>
-            //     <p>Monthly Input Token Cost Calculation: $${totalInputCost.toFixed(2)} (${inputTokenPrice} per 1K tokens)</p>
-            //     <p>Monthly Output Token Cost Calculation: $${totalOutputCost.toFixed(2)} (${outputTokenPrice} per 1K tokens)</p>
-            //     <p>Total Monthly Bedrock Cost Calculation: $${totalCost.toFixed(2)}</p>`;
-     
-
-            // document.getElementById('resetButton').classList.remove('hidden');
-
             const selectedModel = document.getElementById('modelSelect').value;
-            document.getElementById('result').textContent = 'Total Monthly Bedrock Cost: ' + totalCost.toFixed(2) + " USD";
-            document.getElementById('result-details').innerHTML = 
-                '<p>Selected Model: ' + selectedModel + '</p>' +
-                '<p>Monthly Input Token Cost Calculation: (' + inputTokenPrice + ' / 1000) * ' + inputTokens + ' * ' + requestsPerMonth + ' = ' + totalInputCost.toFixed(2) + " USD" + '</p>' +
-                '<p>Monthly Output Token Cost Calculation: (' + outputTokenPrice + ' / 1000) * ' + outputTokens + ' * ' + requestsPerMonth + ' = ' + totalOutputCost.toFixed(2) + " USD" + '</p>' +
-                '<p>Total Monthly Bedrock Cost Calculation: '  + totalInputCost.toFixed(2) + " USD" + ' + ' +  + totalOutputCost.toFixed(2) + " USD" + ' = ' + totalCost.toFixed(2) + " USD" + '</p>';
+            document.getElementById('text-model-result').innerHTML = `
+                <div class="result-item">
+                    <span>Monthly Input Token Cost</span>
+                    <span>${totalInputCost.toFixed(2)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Monthly Output Token Cost</span>
+                    <span>${totalOutputCost.toFixed(2)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Monthly Bedrock Cost</span>
+                    <span>${totalCost.toFixed(2)} USD</span>
+                </div>
+            `;
 
-            document.getElementById('resetButton').classList.remove('hidden');
+            document.getElementById('text-model-result-details').innerHTML = `
+                <div class="detailed-step">
+                    <h3>Cost Calculation Details</h3>
+                    <p>Selected Model: ${selectedModel}</p>
+                    <p>Monthly Input Token Cost Calculation: (${inputTokenPrice} / 1000) × ${inputTokens} × ${requestsPerMonth} = ${totalInputCost.toFixed(2)} USD</p>
+                    <p>Monthly Output Token Cost Calculation: (${outputTokenPrice} / 1000) × ${outputTokens} × ${requestsPerMonth} = ${totalOutputCost.toFixed(2)} USD</p>
+                    <p>Total Monthly Bedrock Cost: ${totalInputCost.toFixed(2)} USD + ${totalOutputCost.toFixed(2)} USD = ${totalCost.toFixed(2)} USD</p>
+                </div>
+            `;
         }
 
-        function resetForm() {
-            document.getElementById('regionSelect').value = '';
-            document.getElementById('providerSelect').value = '';
-            document.getElementById('modelSelect').value = '';
-            document.getElementById('inputTokens').value = '';
-            document.getElementById('outputTokens').value = '';
-            document.getElementById('requestsPerMonth').value = '';
-            document.getElementById('result').textContent = '';
-            document.getElementById('result-details').innerHTML = '';
-            document.getElementById('inputTokenPrice').value = '';
-            document.getElementById('outputTokenPrice').value = '';
-            document.querySelectorAll('.error').forEach(el => el.textContent = '');
-            document.getElementById('resetButton').classList.add('hidden');
-            
+        function resetTextModelCalculator() {
+            document.getElementById('regionSelect').selectedIndex = 0;
+            document.getElementById('providerSelect').innerHTML = '<option value="">Select Provider</option>';
             document.getElementById('providerSelect').disabled = true;
+            document.getElementById('modelSelect').innerHTML = '<option value="">Select Model</option>';
             document.getElementById('modelSelect').disabled = true;
+            
+            ['textInputTokens', 'textOutputTokens', 'requestsPerMonth'].forEach(id => {
+                const el = document.getElementById(id);
+                el.value = '';
+                el.classList.remove('error');
+                document.getElementById(id + 'Error').textContent = "";
+            });
+            
+            document.getElementById('text-model-result').innerHTML = '';
+            document.getElementById('text-model-result-details').innerHTML = '';
         }
 
-        // Keep existing embedding calculator functions
-        function calculateEmbedding() {
-            // const embedTokenPrice = parseFloat(document.getElementById('embedTokenPrice').value);
+        // function calculate
+        // Embedding Cost Calculator Functions
+        function calculateEmbeddingCost() {
             const embedType = document.getElementById('embedType').value;
             const modelType = document.getElementById('modelType').value;
             const embedInputValue = parseFloat(document.getElementById('embedInputValue').value);
-
-            // <select id="modelType">
-            //     <option value="amzonEv1">Amazon Titan Text Embedding</option>
-            //     <option value="amzonEv1">Amazon Titan Text Embedding V2</option>
-            //     <option value="CoherePlain">Cohere Embed English</option>
-            //     <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
-            // </select><br>
-            
-
-            // if (isNaN(embedTokenPrice) || isNaN(embedInputValue)) {
-            //     alert("Please fill out all fields with valid numbers.");
-            //     return;
-            // }
 
             let embedTokenPrice;
 
@@ -1181,43 +1502,58 @@
                 return;
             }
 
-
             let totalEmbedCost;
             let calculationDetails = '';
 
             if (embedType === 'gb') {
                 const totalTokensFromGB = embedInputValue * 161000000; 
                 totalEmbedCost = (embedTokenPrice / 1000) * totalTokensFromGB;
-                calculationDetails = 'Calculation: (' + embedTokenPrice + ' / 1000) * ' + totalTokensFromGB + ' = ' + totalEmbedCost.toFixed(2) + " USD";
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${totalTokensFromGB} tokens = ${totalEmbedCost.toFixed(2)} USD`;
             } else if (embedType === 'millionTokens') {
                 totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue * 1000000; 
-                calculationDetails = 'Calculation: (' + embedTokenPrice + ' / 1000) * ' + embedInputValue + ' million tokens = ' + totalEmbedCost.toFixed(2) + " USD";
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} million tokens = ${totalEmbedCost.toFixed(2)} USD`;
             } else if (embedType === 'tokens') {
                 totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue;
-                calculationDetails = 'Calculation: (' + embedTokenPrice + ' / 1000) * ' + embedInputValue + ' tokens = ' + totalEmbedCost.toFixed(2) + " USD";
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} tokens = ${totalEmbedCost.toFixed(2)} USD`;
             }
 
-            document.getElementById('embedResult').textContent = 'Total Monthly Embedding Cost: ' + totalEmbedCost.toFixed(2) + " USD";
-            document.getElementById('embedResultDetails').innerHTML = '<p>' + calculationDetails + '</p>';
-            document.getElementById('embedResetButton').classList.remove('hidden');
+            document.getElementById('embedding-result').innerHTML = `
+                <div class="result-item">
+                    <span>Selected Model</span>
+                    <span>${document.getElementById('modelType').options[document.getElementById('modelType').selectedIndex].text}</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Monthly Embedding Cost</span>
+                    <span>${totalEmbedCost.toFixed(2)} USD</span>
+                </div>
+            `;
+
+            document.getElementById('embedding-result-details').innerHTML = `
+                <div class="detailed-step">
+                    <h3>Cost Calculation Details</h3>
+                    <p>${calculationDetails}</p>
+                </div>
+            `;
         }
 
-        function resetEmbedding() {
-            // document.getElementById('embedTokenPrice').value = '';
+        function resetEmbeddingCalculator() {
+            document.getElementById('modelType').selectedIndex = 0;
+            document.getElementById('embedType').selectedIndex = 0;
             document.getElementById('embedInputValue').value = '';
-            document.getElementById('embedResult').textContent = '';
-            document.getElementById('embedResultDetails').innerHTML = '';
-            document.querySelectorAll('.error').forEach(el => el.textContent = '');
-            document.getElementById('embedResetButton').classList.add('hidden');
+            document.getElementById('embedding-result').innerHTML = '';
+            document.getElementById('embedding-result-details').innerHTML = '';
         }
 
+        // Initialize dropdowns on page load
         window.onload = function() {
             initializeDropdowns();
         };
     </script>
 
-    <div style="text-align: center; margin-top: 20px; color: #e5eceb; padding: 10px;">
+    <!-- <div style="text-align: center; margin-top: 20px; color: #e5eceb; padding: 10px;">
         <p>Developed by <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" style="color: #e5eceb;">Aditya</a>. Please verify cost estimates prior to implementation.</p>
-    </div>
+    </div> -->
+
+    
 </body>
 </html>
