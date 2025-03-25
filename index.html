@@ -9,9 +9,9 @@
         :root {
             --primary-color: #1a73e8;
             --secondary-color: #34a853;
-            --background-color: #dae1e4;
-            --card-color: #eac3c3;
-            --text-color: #333;
+            --background-color: #000033;
+            --card-color: #81e0dc;
+            --text-color: #171717;
             --border-color: #aa9e9e;
             --hover-color: #185abc;
             --error-color: #ea4335;
@@ -32,15 +32,15 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
 
         .calculator-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             background-color: var(--card-color);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(210, 206, 206, 0.1);
             overflow: hidden;
         }
 
@@ -52,7 +52,7 @@
 
         .tab-button {
             flex: 1;
-            padding: 15px;
+            padding: 5px;
             text-align: center;
             cursor: pointer;
             font-weight: 600;
@@ -72,7 +72,7 @@
 
         .tab-content {
             display: none;
-            padding: 20px;
+            padding: 10px;
         }
 
         .tab-content.active {
@@ -87,12 +87,12 @@
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
             color: var(--text-color);
         }
@@ -100,7 +100,7 @@
         .input-group input,
         .input-group select {
             width: 100%;
-            padding: 10px;
+            padding: 5px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 1rem;
@@ -167,10 +167,10 @@
         }
 
         .results-container {
-            background-color: var(--background-color);
+            background-color: #b1acac;
             border-radius: 6px;
-            padding: 15px;
-            margin-top: 20px;
+            padding: 10px;
+            margin-top: 10px;
         }
 
         .result-item {
@@ -187,7 +187,7 @@
 
         .detailed-breakdown {
             margin-top: 10px;
-            background-color: var(--card-color);
+            background-color: #b1acac;
             border-radius: 6px;
             padding: 15px;
         }
@@ -220,15 +220,21 @@
 </head>
 <body>
     <div class="calculator-container">
-        <div class="tab-buttons">
+        <!-- <div class="tab-buttons">
             <div class="tab-button active" onclick="switchTab('text-model')">Text Model Cost</div>
             <div class="tab-button" onclick="switchTab('embedding')">Embedding Cost</div>
             <div class="tab-button" onclick="switchTab('guardrails')">Guardrails Cost</div>
+        </div> -->
+        <div class="tab-buttons">
+            <div class="tab-button active" onclick="switchTab('text-model')" style="color: white; font-weight: bold;">Text Model Calculator</div>
+            <div class="tab-button" onclick="switchTab('embedding')" style="color: white; font-weight: bold;">Embedding Model Calculator</div>
+            <div class="tab-button" onclick="switchTab('guardrails')" style="color: white; font-weight: bold;">Guardrails Calculator</div>
         </div>
+        
 
         <!-- Text Model Cost Calculator -->
         <div id="text-model-tab" class="tab-content active">
-            <h1 class="calculator-title">Text Based LLM Model Pricing Calculation</h1>
+            <h1 class="calculator-title">Text Based LLM Model On-Demand Cost Calculator</h1>
 
             <div class="input-group">
                 <label>Region</label>
@@ -286,7 +292,7 @@
 
         <!-- Embedding Model Cost Calculator -->
         <div id="embedding-tab" class="tab-content">
-            <h1 class="calculator-title">Embedding Based LLM Model Pricing Calculation</h1>
+            <h1 class="calculator-title">Embedding Based LLM Model On-Demand Cost Calculator</h1>
 
             <div class="input-group">
                 <label>Select Embedding Model</label>
@@ -324,7 +330,7 @@
 
         <!-- Guardrails Cost Calculator -->
         <div id="guardrails-tab" class="tab-content">
-            <h1 class="calculator-title">Amazon Bedrock Guardrails Cost Calculator</h1>
+            <h1 class="calculator-title">Amazon Bedrock Guardrails On-Demand Cost Calculator</h1>
             
             <div class="input-group">
                 <label for="inputTokens">Input Tokens Per Request</label>
