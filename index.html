@@ -1316,19 +1316,19 @@
             document.getElementById("guardrails-results").innerHTML = `
                 <div class="result-item">
                     <span>Content Filter Cost</span>
-                    <span>${contentFilterCost.toFixed(2)} USD</span>
+                    <span>${contentFilterCost.toFixed(4)} USD</span>
                 </div>
                 <div class="result-item">
                     <span>Denied Topics Cost</span>
-                    <span>${deniedTopicsCost.toFixed(2)} USD</span>
+                    <span>${deniedTopicsCost.toFixed(4)} USD</span>
                 </div>
                 <div class="result-item">
                     <span>Contextual Grounding Cost</span>
-                    <span>${contextualGroundingCost.toFixed(2)} USD</span>
+                    <span>${contextualGroundingCost.toFixed(4)} USD</span>
                 </div>
                 <div class="result-item">
                     <span>PII Filter Cost</span>
-                    <span>${piiFilterCost.toFixed(2)} USD</span>
+                    <span>${piiFilterCost.toFixed(4)} USD</span>
                 </div>
                 <div class="result-item">
                     <span>Regex Filter Cost</span>
@@ -1340,31 +1340,31 @@
                 </div>
                 <div class="result-item">
                     <span>Total Cost</span>
-                    <span>${totalCost.toFixed(2)} USD</span>
+                    <span>${totalCost.toFixed(4)} USD</span>
                 </div>
             `;
 
             document.getElementById("guardrails-detailed-breakdown").innerHTML = `
                 <div class="detailed-step">
                     <h3>Step 1: Token to Character Conversion</h3>
-                    <p>Input Tokens Per Request: ${inputTokens} tokens × 3.5 = ${inputCharacters.toFixed(2)} characters</p>
-                    <p>Output Tokens Per Response: ${outputTokens} tokens × 3.5 = ${outputCharacters.toFixed(2)} characters</p>
+                    <p>Input Tokens Per Request: ${inputTokens} tokens × 3.5 = ${inputCharacters.toFixed(4)} characters</p>
+                    <p>Output Tokens Per Response: ${outputTokens} tokens × 3.5 = ${outputCharacters.toFixed(4)} characters</p>
                 </div>
 
                 <div class="detailed-step">
                     <h3>Step 2: Units Calculation</h3>
-                    <p>Input Units Per Request: ${inputCharacters.toFixed(2)} characters ÷ 1000 = ${inputUnits} units (rounded up)</p>
-                    <p>Output Units Per Response: ${outputCharacters.toFixed(2)} characters ÷ 1000 = ${outputUnits} units (rounded up)</p>
+                    <p>Input Units Per Request: ${inputCharacters.toFixed(4)} characters ÷ 1000 = ${inputUnits} units (rounded up)</p>
+                    <p>Output Units Per Response: ${outputCharacters.toFixed(4)} characters ÷ 1000 = ${outputUnits} units (rounded up)</p>
                     <p>Total Units: ${inputUnits} + ${outputUnits} = ${totalUnitsPerRequest} units</p>
                     <p>Total Units per Month: ${totalUnitsPerRequest} units × ${requests} requests = ${totalUnits} units</p>
                 </div>
 
                 <div class="detailed-step">
                     <h3>Step 3: Cost Calculation</h3>
-                    <p>Content Filter: ${totalUnits} units × $0.15 per 1000 units = ${contentFilterCost.toFixed(2)} USD</p>
-                    <p>Denied Topics: ${totalUnits} units × $0.15 per 1000 units = ${deniedTopicsCost.toFixed(2)} USD</p>
-                    <p>Contextual Grounding: ${totalUnits} units × $0.10 per 1000 units = ${contextualGroundingCost.toFixed(2)} USD</p>
-                    <p>PII Filter: ${totalUnits} units × $0.10 per 1000 units = ${piiFilterCost.toFixed(2)} USD</p>
+                    <p>Content Filter: ${totalUnits} units × $0.15 per 1000 units = ${contentFilterCost.toFixed(4)} USD</p>
+                    <p>Denied Topics: ${totalUnits} units × $0.15 per 1000 units = ${deniedTopicsCost.toFixed(4)} USD</p>
+                    <p>Contextual Grounding: ${totalUnits} units × $0.10 per 1000 units = ${contextualGroundingCost.toFixed(4)} USD</p>
+                    <p>PII Filter: ${totalUnits} units × $0.10 per 1000 units = ${piiFilterCost.toFixed(4)} USD</p>
                 </div>
             `;
 
@@ -1444,15 +1444,15 @@
             document.getElementById('text-model-result').innerHTML = `
                 <div class="result-item">
                     <span>Monthly Input Token Cost</span>
-                    <span>${totalInputCost.toFixed(2)} USD</span>
+                    <span>${totalInputCost.toFixed(4)} USD</span>
                 </div>
                 <div class="result-item">
                     <span>Monthly Output Token Cost</span>
-                    <span>${totalOutputCost.toFixed(2)} USD</span>
+                    <span>${totalOutputCost.toFixed(4)} USD</span>
                 </div>
                 <div class="result-item">
                     <span>Total Monthly Bedrock Cost</span>
-                    <span>${totalCost.toFixed(2)} USD</span>
+                    <span>${totalCost.toFixed(4)} USD</span>
                 </div>
             `;
 
@@ -1460,9 +1460,9 @@
                 <div class="detailed-step">
                     <h3>Cost Calculation Details</h3>
                     <p>Selected Model: ${selectedModel}</p>
-                    <p>Monthly Input Token Cost Calculation: (${inputTokenPrice} / 1000) × ${inputTokens} × ${requestsPerMonth} = ${totalInputCost.toFixed(2)} USD</p>
-                    <p>Monthly Output Token Cost Calculation: (${outputTokenPrice} / 1000) × ${outputTokens} × ${requestsPerMonth} = ${totalOutputCost.toFixed(2)} USD</p>
-                    <p>Total Monthly Bedrock Cost: ${totalInputCost.toFixed(2)} USD + ${totalOutputCost.toFixed(2)} USD = ${totalCost.toFixed(2)} USD</p>
+                    <p>Monthly Input Token Cost Calculation: (${inputTokenPrice} / 1000) × ${inputTokens} × ${requestsPerMonth} = ${totalInputCost.toFixed(4)} USD</p>
+                    <p>Monthly Output Token Cost Calculation: (${outputTokenPrice} / 1000) × ${outputTokens} × ${requestsPerMonth} = ${totalOutputCost.toFixed(4)} USD</p>
+                    <p>Total Monthly Bedrock Cost: ${totalInputCost.toFixed(4)} USD + ${totalOutputCost.toFixed(4)} USD = ${totalCost.toFixed(4)} USD</p>
                 </div>
             `;
         }
@@ -1514,13 +1514,13 @@
             if (embedType === 'gb') {
                 const totalTokensFromGB = embedInputValue * 161000000; 
                 totalEmbedCost = (embedTokenPrice / 1000) * totalTokensFromGB;
-                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${totalTokensFromGB} tokens = ${totalEmbedCost.toFixed(2)} USD`;
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${totalTokensFromGB} tokens = ${totalEmbedCost.toFixed(4)} USD`;
             } else if (embedType === 'millionTokens') {
                 totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue * 1000000; 
-                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} million tokens = ${totalEmbedCost.toFixed(2)} USD`;
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} million tokens = ${totalEmbedCost.toFixed(4)} USD`;
             } else if (embedType === 'tokens') {
                 totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue;
-                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} tokens = ${totalEmbedCost.toFixed(2)} USD`;
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} tokens = ${totalEmbedCost.toFixed(4)} USD`;
             }
 
             document.getElementById('embedding-result').innerHTML = `
@@ -1530,7 +1530,7 @@
                 </div>
                 <div class="result-item">
                     <span>Total Monthly Embedding Cost</span>
-                    <span>${totalEmbedCost.toFixed(2)} USD</span>
+                    <span>${totalEmbedCost.toFixed(4)} USD</span>
                 </div>
             `;
 
