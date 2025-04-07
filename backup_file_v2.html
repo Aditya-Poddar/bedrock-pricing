@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Bedrock Cost Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --background-color: #000033;
+            --card-color: #81e0dc;
+            --text-color: #171717;
+            --border-color: #aa9e9e;
+            --hover-color: #185abc;
+            --error-color: #ea4335;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .calculator-container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--card-color);
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(210, 206, 206, 0.1);
+            overflow: hidden;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background-color: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 10px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .calculator-title {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .input-group .error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .input-group input.error,
+        .input-group select.error {
+            border-color: var(--error-color);
+        }
+
+        .input-group input.error + .error,
+        .input-group select.error + .error {
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-calculate {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background-color: var(--hover-color);
+        }
+
+        .btn-reset {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #c5221f;
+        }
+
+        .results-container {
+            background-color: #b1acac;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+        }
+
+        .detailed-breakdown {
+            margin-top: 10px;
+            background-color: #b1acac;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .detailed-step {
+            margin-bottom: 15px;
+        }
+
+        .detailed-step h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .tab-buttons {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                border-bottom: none;
+                border-right: 3px solid transparent;
+            }
+
+            .tab-button.active {
+                border-bottom: none;
+                border-right-color: var(--primary-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <!-- <div class="tab-buttons">
+            <div class="tab-button active" onclick="switchTab('text-model')">Text Model Cost</div>
+            <div class="tab-button" onclick="switchTab('embedding')">Embedding Cost</div>
+            <div class="tab-button" onclick="switchTab('guardrails')">Guardrails Cost</div>
+        </div> -->
+        <div class="tab-buttons">
+            <div class="tab-button active" onclick="switchTab('text-model')" style="color: white; font-weight: bold;">Text Model Calculator</div>
+            <div class="tab-button" onclick="switchTab('embedding')" style="color: white; font-weight: bold;">Embedding Model Calculator</div>
+            <div class="tab-button" onclick="switchTab('guardrails')" style="color: white; font-weight: bold;">Guardrails Calculator</div>
+        </div>
+        
+
+        <!-- Text Model Cost Calculator -->
+        <div id="text-model-tab" class="tab-content active">
+            <h1 class="calculator-title">Text Based LLM Model On-Demand Cost Calculator</h1>
+
+            <div class="input-group">
+                <label>Region</label>
+                <select id="regionSelect" onchange="updateProviders()">
+                    <option value="">Select Region</option>
+                </select>
+                <div class="error">Please select a region</div>
+            </div>
+
+            <div class="input-group">
+                <label>Provider</label>
+                <select id="providerSelect" onchange="updateModels()" disabled>
+                    <option value="">Select Provider</option>
+                </select>
+                <div class="error">Please select a provider</div>
+            </div>
+
+            <div class="input-group">
+                <label>Model</label>
+                <select id="modelSelect" onchange="updatePricing()" disabled>
+                    <option value="">Select Model</option>
+                </select>
+                <div class="error">Please select a model</div>
+            </div>
+
+            <input type="hidden" id="inputTokenPrice">
+            <input type="hidden" id="outputTokenPrice">
+
+            <div class="input-group">
+                <label>Total No. of Input Tokens Per Request</label>
+                <input type="text" id="textInputTokens" placeholder="Enter input tokens" oninput="validateInput(this)">
+                <div class="error" id="textInputTokensError"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Total No. of Output Tokens Per Request</label>
+                <input type="text" id="textOutputTokens" placeholder="Enter output tokens" oninput="validateInput(this)">
+                <div class="error" id="textOutputTokensError"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Total Number of Requests per Month</label>
+                <input type="text" id="requestsPerMonth" placeholder="Enter requests per month" oninput="validateInput(this)">
+                <div class="error" id="requestsPerMonthError"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateTextModelCost()">Calculate Text Model Cost</button>
+                <button class="btn btn-reset" onclick="resetTextModelCalculator()">Reset</button>
+            </div>
+
+            <div id="text-model-result" class="results-container"></div>
+            <div id="text-model-result-details" class="detailed-breakdown"></div>
+        </div>
+
+        <!-- Embedding Model Cost Calculator -->
+        <div id="embedding-tab" class="tab-content">
+            <h1 class="calculator-title">Embedding Based LLM Model On-Demand Cost Calculator</h1>
+
+            <div class="input-group">
+                <label>Select Embedding Model</label>
+                <select id="modelType">
+                    <option value="amzonEv1">Amazon Titan Text Embedding v1</option>
+                    <option value="amzonEv2">Amazon Titan Text Embedding v2</option>
+                    <option value="CoherePlain">Cohere Embed English</option>
+                    <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Select Input Type</label>
+                <select id="embedType">
+                    <option value="gb">Total Data Size in GB</option>
+                    <option value="millionTokens">Total Number of Tokens in Million</option>
+                    <option value="tokens">Total Number of Tokens</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Enter Value</label>
+                <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)">
+                <div class="error" id="embedInputValueError"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateEmbeddingCost()">Calculate Embedding Model Cost</button>
+                <button class="btn btn-reset" onclick="resetEmbeddingCalculator()">Reset</button>
+            </div>
+
+            <div id="embedding-result" class="results-container"></div>
+            <div id="embedding-result-details" class="detailed-breakdown"></div>
+        </div>
+
+        <!-- Guardrails Cost Calculator -->
+        <div id="guardrails-tab" class="tab-content">
+            <h1 class="calculator-title">Amazon Bedrock Guardrails On-Demand Cost Calculator</h1>
+            
+            <div class="input-group">
+                <label for="inputTokens">Input Tokens Per Request</label>
+                <input type="number" id="inputTokens" placeholder="Enter input tokens" min="1">
+                <div class="error">Please enter a positive integer</div>
+            </div>
+
+            <div class="input-group">
+                <label for="outputTokens">Output Tokens Per Request</label>
+                <input type="number" id="outputTokens" placeholder="Enter output tokens" min="1">
+                <div class="error">Please enter a positive integer</div>
+            </div>
+
+            <div class="input-group">
+                <label for="requests">Total Number of Requests Per Month</label>
+                <input type="number" id="requests" placeholder="Enter requests per hour" min="1">
+                <div class="error">Please enter a positive integer</div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateGuardrailsCost()">Calculate Cost</button>
+                <button class="btn btn-reset" onclick="resetGuardrailsCalculator()">Reset</button>
+            </div>
+
+            <div id="guardrails-results" class="results-container"></div>
+            <div id="guardrails-detailed-breakdown" class="detailed-breakdown" style="display:none;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab Switching Function
+        function switchTab(tabName) {
+            // Remove active class from all tabs and tab buttons
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Add active class to selected tab and tab button
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Validation Function
+        function validateInput(input) {
+            const errorElement = document.getElementById(input.id + 'Error');
+            const value = input.value;
+            const positiveNumberRegex = /^(0|[1-9]\d*)(\.\d+)?$/;
+
+            if (value === '' || positiveNumberRegex.test(value)) {
+                errorElement.textContent = "";
+                input.classList.remove('error');
+            } else {
+                errorElement.textContent = "Please enter a positive number.";
+                input.classList.add('error');
+            }
+            input.value = value.replace(/[^0-9.]/g, '');
+        }
+        
+
+        // Rest of the JavaScript remains the same as in the previous implementation
+        // (Guardrails, Text Model, and Embedding Cost Calculator functions)
+        // Copy the rest of the script from the previous implementation
+        // Existing functions like calculateGuardrailsCost(), resetGuardrailsCalculator(), etc.
+        
+        // Pricing data object and other existing functions
+        const pricingData = {
+            "Regions": {
+                "US East 1 (N. Virginia)": {
+                "Providers": {
+                    "AI21 Labs": {
+                    "Models": {
+                        "Jamba 1.5 Large": {
+                        "Cost per 1000 input tokens": "$0.002",
+                        "Cost per 1000 output tokens": "$0.008"
+                        },
+                        "Jamba 1.5 Mini": {
+                        "Cost per 1000 input tokens": "$0.0002",
+                        "Cost per 1000 output tokens": "$0.0004"
+                        },
+                        "Jurassic-2 Mid": {
+                        "Cost per 1000 input tokens": "$0.0125",
+                        "Cost per 1000 output tokens": "$0.0125"
+                        },
+                        "Jurassic-2 Ultra": {
+                        "Cost per 1000 input tokens": "$0.0188",
+                        "Cost per 1000 output tokens": "$0.0188"
+                        },
+                        "Jamba-Instruct": {
+                        "Cost per 1000 input tokens": "$0.0005",
+                        "Cost per 1000 output tokens": "$0.0007"
+                        }
+                    }
+                    },
+                    "Amazon Titan": {
+                    "Models": {
+                        "Titan Text G1 -Lite": {
+                        "Cost per 1000 input tokens": "$0.00015",
+                        "Cost per 1000 output tokens": "$0.0002"
+                        },
+                        "Titan Text G1 -Express": {
+                        "Cost per 1000 input tokens": "$0.0002",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Titan Text G1 -Premier": {
+                        "Cost per 1000 input tokens": "$0.0005",
+                        "Cost per 1000 output tokens": "$0.0015"
+                        }
+                    }
+                    },
+                    "Amazon Nova": {
+                    "Models": {
+                        "Amazon Nova Micro": {
+                            "Cost per 1000 input tokens": "$0.000035",
+                            "Cost per 1000 output tokens": "$0.00014"
+                        },
+                        "Amazon Nova Lite": {
+                            "Cost per 1000 input tokens": "$0.00006",
+                            "Cost per 1000 output tokens": "$0.00024"
+                        },
+                        "Amazon Nova Pro": {
+                            "Cost per 1000 input tokens": "$0.0008",
+                            "Cost per 1000 output tokens": "$0.0032"
+                        },
+                        "Amazon Nova Pro (Latency Optimized)": {
+                            "Cost per 1000 input tokens": "$0.001",
+                            "Cost per 1000 output tokens": "$0.004"
+                        }
+                    }
+                    },
+                    "Anthropic": {
+                    "Models": {
+                        "Claude 3.7 Sonnet": {
+                            "Cost per 1000 input tokens": "$0.003",
+                            "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3.5 Sonnet": {
+                            "Cost per 1000 input tokens": "$0.003",
+                            "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3.5 Haiku": {
+                            "Cost per 1000 input tokens": "$0.0008",
+                            "Cost per 1000 output tokens": "$0.004"
+                        },
+                        "Claude 3 Opus": {
+                        "Cost per 1000 input tokens": "$0.015",
+                        "Cost per 1000 output tokens": "$0.075"
+                        },
+                        "Claude 3 Sonnet": {
+                        "Cost per 1000 input tokens": "$0.003",
+                        "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3 Haiku": {
+                        "Cost per 1000 input tokens": "$0.00025",
+                        "Cost per 1000 output tokens": "$0.00125"
+                        },
+                        "Claude 2.1": {
+                        "Cost per 1000 input tokens": "$0.008",
+                        "Cost per 1000 output tokens": "$0.024"
+                        },
+                        "Claude 2.0": {
+                        "Cost per 1000 input tokens": "$0.008",
+                        "Cost per 1000 output tokens": "$0.024"
+                        },
+                        "Claude Instant": {
+                        "Cost per 1000 input tokens": "$0.0008",
+                        "Cost per 1000 output tokens": "$0.0024"
+                        }
+                    }
+                    },
+                    "DeepSeek": {
+                    "Models": {
+                        "DeepSeek R-1": {
+                            "Cost per 1000 input tokens": "$0.00135",
+                            "Cost per 1000 output tokens": "$0.0054"
+                        }
+                    }
+                    },
+                    "Cohere": {
+                    "Models": {
+                        "Command": {
+                        "Cost per 1000 input tokens": "$0.0015",
+                        "Cost per 1000 output tokens": "$0.0020"
+                        },
+                        "Command-Light": {
+                        "Cost per 1000 input tokens": "$0.0003",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Command R+": {
+                        "Cost per 1000 input tokens": "$0.0030",
+                        "Cost per 1000 output tokens": "$0.0150"
+                        },
+                        "Command R": {
+                        "Cost per 1000 input tokens": "$0.0005",
+                        "Cost per 1000 output tokens": "$0.0015"
+                        }
+                    }
+                    },
+                    "Meta Llama 3.2": {
+                    "Models": {
+                        "Llama 3.2 Instruct (1B)": {
+                        "Cost per 1000 input tokens": "$0.0001",
+                        "Cost per 1000 output tokens": "$0.0001"
+                        },
+                        "Llama 3.2 Instruct (3B)": {
+                        "Cost per 1000 input tokens": "$0.00015",
+                        "Cost per 1000 output tokens": "$0.00015"
+                        },
+                        "Llama 3.2 Instruct (11B)": {
+                        "Cost per 1000 input tokens": "$0.00035",
+                        "Cost per 1000 output tokens": "$0.00035"
+                        },
+                        "Llama 3.2 Instruct (90B)": {
+                        "Cost per 1000 input tokens": "$0.002",
+                        "Cost per 1000 output tokens": "$0.002"
+                        }
+                    }
+                    },
+                    "Meta Llama 3": {
+                    "Models": {
+                        "Llama 3 Instruct (8B)": {
+                        "Cost per 1000 input tokens": "$0.0003",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Llama 3 Instruct (70B)": {
+                        "Cost per 1000 input tokens": "$0.00265",
+                        "Cost per 1000 output tokens": "$0.0035"
+                        }
+                    }
+                    },
+                    "Meta Llama 2": {
+                    "Models": {
+                        "Llama 2 Chat (13B)": {
+                        "Cost per 1000 input tokens": "$0.00075",
+                        "Cost per 1000 output tokens": "$0.001"
+                        },
+                        "Llama 2 Chat (70B)": {
+                        "Cost per 1000 input tokens": "$0.00195",
+                        "Cost per 1000 output tokens": "$0.00256"
+                        }
+                    }
+                    },
+                    "Mistral AI": {
+                    "Models": {
+                        "Mistral 7B": {
+                        "Cost per 1000 input tokens": "$0.00015",
+                        "Cost per 1000 output tokens": "$0.0002"
+                        },
+                        "Mixtral 8*7B": {
+                        "Cost per 1000 input tokens": "$0.00045",
+                        "Cost per 1000 output tokens": "$0.0007"
+                        },
+                        "Mistral Small (24.02)": {
+                        "Cost per 1000 input tokens": "$0.001",
+                        "Cost per 1000 output tokens": "$0.003"
+                        },
+                        "Mistral Large (24.07)": {
+                        "Cost per 1000 input tokens": "$0.004",
+                        "Cost per 1000 output tokens": "$0.012"
+                        }
+                    }
+                    }
+                }
+                },
+                "US West 2 (Oregon)": {
+                "Providers": {
+                    "Amazon Titan": {
+                    "Models": {
+                        "Titan Text G1 -Lite": {
+                        "Cost per 1000 input tokens": "$0.00015",
+                        "Cost per 1000 output tokens": "$0.0002"
+                        },
+                        "Titan Text G1 -Express": {
+                        "Cost per 1000 input tokens": "$0.0002",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        }
+                    }
+                    },
+                    "Amazon Nova": {
+                    "Models": {
+                        "Amazon Nova Micro": {
+                            "Cost per 1000 input tokens": "$0.000035",
+                            "Cost per 1000 output tokens": "$0.00014"
+                        },
+                        "Amazon Nova Lite": {
+                            "Cost per 1000 input tokens": "$0.00006",
+                            "Cost per 1000 output tokens": "$0.00024"
+                        },
+                        "Amazon Nova Pro": {
+                            "Cost per 1000 input tokens": "$0.0008",
+                            "Cost per 1000 output tokens": "$0.0032"
+                        },
+                        "Amazon Nova Pro (Latency Optimized)": {
+                            "Cost per 1000 input tokens": "$0.001",
+                            "Cost per 1000 output tokens": "$0.004"
+                        }
+                    }
+                    },
+                    "Anthropic": {
+                    "Models": {
+                        "Claude 3.7 Sonnet": {
+                            "Cost per 1000 input tokens": "$0.003",
+                            "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3.5 Sonnet": {
+                            "Cost per 1000 input tokens": "$0.003",
+                            "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3.5 Haiku": {
+                            "Cost per 1000 input tokens": "$0.0008",
+                            "Cost per 1000 output tokens": "$0.004"
+                        },
+                        "Claude 3 Opus": {
+                        "Cost per 1000 input tokens": "$0.015",
+                        "Cost per 1000 output tokens": "$0.075"
+                        },
+                        "Claude 3 Sonnet": {
+                        "Cost per 1000 input tokens": "$0.003",
+                        "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3 Haiku": {
+                        "Cost per 1000 input tokens": "$0.00025",
+                        "Cost per 1000 output tokens": "$0.00125"
+                        },
+                        "Claude 2.1": {
+                        "Cost per 1000 input tokens": "$0.008",
+                        "Cost per 1000 output tokens": "$0.024"
+                        },
+                        "Claude 2.0": {
+                        "Cost per 1000 input tokens": "$0.008",
+                        "Cost per 1000 output tokens": "$0.024"
+                        },
+                        "Claude Instant": {
+                        "Cost per 1000 input tokens": "$0.0008",
+                        "Cost per 1000 output tokens": "$0.0024"
+                        }
+                    }
+                    },
+                    "Cohere": {
+                    "Models": {
+                        "Command": {
+                        "Cost per 1000 input tokens": "$0.0015",
+                        "Cost per 1000 output tokens": "$0.0020"
+                        },
+                        "Command-Light": {
+                        "Cost per 1000 input tokens": "$0.0003",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Command R+": {
+                        "Cost per 1000 input tokens": "$0.0030",
+                        "Cost per 1000 output tokens": "$0.0150"
+                        },
+                        "Command R": {
+                        "Cost per 1000 input tokens": "$0.0005",
+                        "Cost per 1000 output tokens": "$0.0015"
+                        }
+                    }
+                    },
+                    "Meta Llama 3.3": {
+                    "Models": {
+                        "Llama 3.3 Instruct (70B)": {
+                            "Cost per 1000 input tokens": "$0.00072",
+                            "Cost per 1000 output tokens": "$0.00072"
+                        }
+                    }
+                    },
+                    "Meta Llama 3.2": {
+                    "Models": {
+                        "Llama 3.2 Instruct (1B)": {
+                        "Cost per 1000 input tokens": "$0.0001",
+                        "Cost per 1000 output tokens": "$0.0001"
+                        },
+                        "Llama 3.2 Instruct (3B)": {
+                        "Cost per 1000 input tokens": "$0.00015",
+                        "Cost per 1000 output tokens": "$0.00015"
+                        },
+                        "Llama 3.2 Instruct (11B)": {
+                        "Cost per 1000 input tokens": "$0.00035",
+                        "Cost per 1000 output tokens": "$0.00035"
+                        },
+                        "Llama 3.2 Instruct (90B)": {
+                        "Cost per 1000 input tokens": "$0.002",
+                        "Cost per 1000 output tokens": "$0.002"
+                        }
+                    }
+                    },
+                    "Meta Llama 3.1": {
+                    "Models": {
+                        "Llama 3.1 Instruct (8B)": {
+                        "Cost per 1000 input tokens": "$0.00022",
+                        "Cost per 1000 output tokens": "$0.00022"
+                        },
+                        "Llama 3.1 Instruct (70B)": {
+                        "Cost per 1000 input tokens": "$0.00099",
+                        "Cost per 1000 output tokens": "$0.00099"
+                        },
+                        "Llama 3.1 Instruct (405B)": {
+                        "Cost per 1000 input tokens": "$0.00532",
+                        "Cost per 1000 output tokens": "$0.016"
+                        }
+                    }
+                    },
+                    "Meta Llama 3": {
+                    "Models": {
+                        "Llama 3 Instruct (8B)": {
+                        "Cost per 1000 input tokens": "$0.0003",
+                        "Cost per 1000 output tokens": "$0.0006"
+                        },
+                        "Llama 3 Instruct (70B)": {
+                        "Cost per 1000 input tokens": "$0.00265",
+                        "Cost per 1000 output tokens": "$0.0035"
+                        }
+                    }
+                    },
+                    "Meta Llama 2": {
+                    "Models": {
+                        "Llama 2 Chat (13B)": {
+                        "Cost per 1000 input tokens": "$0.00075",
+                        "Cost per 1000 output tokens": "$0.001"
+                        },
+                        "Llama 2 Chat (70B)": {
+                        "Cost per 1000 input tokens": "$0.00195",
+                        "Cost per 1000 output tokens": "$0.00256"
+                        }
+                    }
+                    },
+                    "Mistral AI": {
+                    "Models": {
+                        "Mistral 7B": {
+                        "Cost per 1000 input tokens": "$0.00015",
+                        "Cost per 1000 output tokens": "$0.0002"
+                        },
+                        "Mixtral 8*7B": {
+                        "Cost per 1000 input tokens": "$0.00045",
+                        "Cost per 1000 output tokens": "$0.0007"
+                        },
+                        "Mistral Large (24.02)": {
+                        "Cost per 1000 input tokens": "$0.004",
+                        "Cost per 1000 output tokens": "$0.012"
+                        },
+                        "Mistral Large 2 (24.07)": {
+                        "Cost per 1000 input tokens": "$0.002",
+                        "Cost per 1000 output tokens": "$0.006"
+                        }
+                    }
+                    }
+
+                }
+                },
+                "Asia Pacific (Mumbai)": {
+                "Providers": {
+                    "Amazon Titan": {
+                    "Models": {
+                        "Titan Text G1 -Lite": {
+                        "Cost per 1000 input tokens": "$0.0004",
+                        "Cost per 1000 output tokens": "$0.0005"
+                        },
+                        "Titan Text G1 -Express": {
+                        "Cost per 1000 input tokens": "$0.001",
+                        "Cost per 1000 output tokens": "$0.0019"
+                        }
+                    }
+                    },
+                    "Amazon Nova": {
+                    "Models": {
+                        "Amazon Nova Micro": {
+                            "Cost per 1000 input tokens": "$0.000041",
+                            "Cost per 1000 output tokens": "$0.000164"
+                        },
+                        "Amazon Nova Lite": {
+                            "Cost per 1000 input tokens": "$0.000071",
+                            "Cost per 1000 output tokens": "$0.000284"
+                        },
+                        "Amazon Nova Pro": {
+                            "Cost per 1000 input tokens": "$0.00094",
+                            "Cost per 1000 output tokens": "$0.00376"
+                        }
+                    }
+                    },
+                    "Anthropic": {
+                    "Models": {
+                        "Claude 3 Sonnet": {
+                        "Cost per 1000 input tokens": "$0.003",
+                        "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3 Haiku": {
+                        "Cost per 1000 input tokens": "$0.00025",
+                        "Cost per 1000 output tokens": "$0.00125"
+                        }
+                    }
+                    },
+                    "Meta Llama 3": {
+                    "Models": {
+                        "Llama 3 Instruct (8B)": {
+                        "Cost per 1000 input tokens": "$0.00036",
+                        "Cost per 1000 output tokens": "$0.00072"
+                        },
+                        "Llama 3 Instruct (70B)": {
+                        "Cost per 1000 input tokens": "$0.00318",
+                        "Cost per 1000 output tokens": "$0.0042"
+                        }
+                    }
+                    },
+                    "Mistral AI": {
+                    "Models": {
+                        "Mistral 7B": {
+                        "Cost per 1000 input tokens": "$0.00018",
+                        "Cost per 1000 output tokens": "$0.00024"
+                        },
+                        "Mixtral 8*7B": {
+                        "Cost per 1000 input tokens": "$0.00054",
+                        "Cost per 1000 output tokens": "$0.00084"
+                        },
+                        "Mistral Large (24.07)": {
+                        "Cost per 1000 input tokens": "$0.0048",
+                        "Cost per 1000 output tokens": "$0.0144"
+                        }
+                    }
+                    }
+                }
+                },
+                "Europe (London)": {
+                "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Lite": {
+                            "Cost per 1000 input tokens": "$0.0002",
+                            "Cost per 1000 output tokens": "$0.0003"
+                        },
+                        "Titan Text G1 -Express": {
+                            "Cost per 1000 input tokens": "$0.0003",
+                            "Cost per 1000 output tokens": "$0.0009"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                    "Claude 3 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    },
+                    "Claude 3 Haiku": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00125"
+                    }
+                },
+                "Mistral": {
+                    "Mistral 7B": {
+                    "Cost per 1000 input tokens": "$0.0002",
+                    "Cost per 1000 output tokens": "$0.00026"
+                    },
+                    "Mixtral 8*7B": {
+                    "Cost per 1000 input tokens": "$0.00059",
+                    "Cost per 1000 output tokens": "$0.00091"
+                    },
+                    "Mistral Large (24.02)": {
+                    "Cost per 1000 input tokens": "$0.0052",
+                    "Cost per 1000 output tokens": "$0.0156"
+                    }
+                },
+                "Llama 3": {
+                    "Llama 3 Instruct (8B)": {
+                    "Cost per 1000 input tokens": "$0.00039",
+                    "Cost per 1000 output tokens": "$0.00078"
+                    },
+                    "Llama 3 Instruct (70B)": {
+                    "Cost per 1000 input tokens": "$0.00345",
+                    "Cost per 1000 output tokens": "$0.00455"
+                    }
+                }
+                },
+                "South America (Sao Paolo)": {
+                "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Lite": {
+                            "Cost per 1000 input tokens": "$0.0003",
+                            "Cost per 1000 output tokens": "$0.0004"
+                        },
+                        "Titan Text G1 -Express": {
+                            "Cost per 1000 input tokens": "$0.0004",
+                            "Cost per 1000 output tokens": "$0.0011"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                        "Claude 3 Sonnet": {
+                        "Cost per 1000 input tokens": "$0.003",
+                        "Cost per 1000 output tokens": "$0.015"
+                        },
+                        "Claude 3 Haiku": {
+                        "Cost per 1000 input tokens": "$0.00025",
+                        "Cost per 1000 output tokens": "$0.00125"
+                        }
+                },
+                "Mistral": {
+                    "Mistral 7B": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00034"
+                    },
+                    "Mixtral 8*7B": {
+                    "Cost per 1000 input tokens": "$0.00076",
+                    "Cost per 1000 output tokens": "$0.00118"
+                    },
+                    "Mistral Large (24.02)": {
+                    "Cost per 1000 input tokens": "$0.0067",
+                    "Cost per 1000 output tokens": "$0.0202"
+                    }
+                },
+                "Llama 3": {
+                    "Llama 3 Instruct (8B)": {
+                    "Cost per 1000 input tokens": "$0.0005",
+                    "Cost per 1000 output tokens": "$0.00101"
+                    },
+                    "Llama 3 Instruct (70B)": {
+                    "Cost per 1000 input tokens": "$0.00445",
+                    "Cost per 1000 output tokens": "$0.00588"
+                    }
+                }
+                },
+                "Canada (Central)": {
+                    "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Lite": {
+                            "Cost per 1000 input tokens": "$0.0002",
+                            "Cost per 1000 output tokens": "$0.0003"
+                        },
+                        "Titan Text G1 -Express": {
+                            "Cost per 1000 input tokens": "$0.0003",
+                            "Cost per 1000 output tokens": "$0.0008"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                    "Claude 3 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    },
+                    "Claude 3 Haiku": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00125"
+                    }
+                },
+                "Mistral": {
+                    "Mistral 7B": {
+                    "Cost per 1000 input tokens": "$0.00017",
+                    "Cost per 1000 output tokens": "$0.00023"
+                    },
+                    "Mixtral 8*7B": {
+                    "Cost per 1000 input tokens": "$0.00052",
+                    "Cost per 1000 output tokens": "$0.00081"
+                    },
+                    "Mistral Large (24.02)": {
+                    "Cost per 1000 input tokens": "$0.0046",
+                    "Cost per 1000 output tokens": "$0.0138"
+                    }
+                },
+                "Llama 3": {
+                    "Llama 3 Instruct (8B)": {
+                    "Cost per 1000 input tokens": "$0.00035",
+                    "Cost per 1000 output tokens": "$0.00069"
+                    },
+                    "Llama 3 Instruct (70B)": {
+                    "Cost per 1000 input tokens": "$0.00305",
+                    "Cost per 1000 output tokens": "$0.00403"
+                    }
+                }
+
+                },
+                "Asia Pacific (Sydney)": {
+                "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Lite": {
+                            "Cost per 1000 input tokens": "$0.0002",
+                            "Cost per 1000 output tokens": "$0.00025"
+                        },
+                        "Titan Text G1 -Express": {
+                            "Cost per 1000 input tokens": "$0.00025",
+                            "Cost per 1000 output tokens": "$0.000788"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                    "Claude 3 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    },
+                    "Claude 3 Haiku": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00125"
+                    }
+                },
+                "Mistral": {
+                    "Mistral 7B": {
+                    "Cost per 1000 input tokens": "$0.0002",
+                    "Cost per 1000 output tokens": "$0.00026"
+                    },
+                    "Mixtral 8*7B": {
+                    "Cost per 1000 input tokens": "$0.00059",
+                    "Cost per 1000 output tokens": "$0.00091"
+                    },
+                    "Mistral Large (24.02)": {
+                    "Cost per 1000 input tokens": "$0.0052",
+                    "Cost per 1000 output tokens": "$0.0156"
+                    }
+                }
+                },
+                "Asia Pacific (Tokyo)": {
+                    "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Lite": {
+                            "Cost per 1000 input tokens": "$0.000275",
+                            "Cost per 1000 output tokens": "$0.000825"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                        "Claude Instant": {
+                            "Cost per 1000 input tokens": "$0.0008",
+                            "Cost per 1000 output tokens": "$0.0024"
+                        },
+                        "Claude 2.0/2.1": {
+                            "Cost per 1000 input tokens": "$0.008",
+                            "Cost per 1000 output tokens": "$0.024"
+                        },
+                        "Claude 3 Haiku": {
+                            "Cost per 1000 input tokens": "$0.00025",
+                            "Cost per 1000 output tokens": "$0.00125"
+                        },
+                        "Claude 3.5 Sonnet": {
+                            "Cost per 1000 input tokens": "$0.003",
+                            "Cost per 1000 output tokens": "$0.015"
+                        }
+                }
+                },
+                "Asia Pacific (Singapore)": {
+                "Anthropic": {
+                    "Claude Instant": {
+                    "Cost per 1000 input tokens": "$0.0008",
+                    "Cost per 1000 output tokens": "$0.0024"
+                    },
+                    "Claude 2.0/2.1": {
+                    "Cost per 1000 input tokens": "$0.008",
+                    "Cost per 1000 output tokens": "$0.024"
+                    },
+                    "Claude 3 Haiku": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00125"
+                    },
+                    "Claude 3.5 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    }
+                }
+                },
+                "Europe (Paris)": {
+                    "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Lite": {
+                            "Cost per 1000 input tokens": "$0.0002",
+                            "Cost per 1000 output tokens": "$0.00025"
+                        },
+                        "Titan Text G1 -Express": {
+                            "Cost per 1000 input tokens": "$0.00025",
+                            "Cost per 1000 output tokens": "$0.000788"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                    "Claude 3 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    },
+                    "Claude 3 Haiku": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00125"
+                    }
+                },
+                "Llama 3.2": {
+                    "Llama 3.2 Instruct (1B)": {
+                    "Cost per 1000 input tokens": "$0.00013",
+                    "Cost per 1000 output tokens": "$0.00013"
+                    },
+                    "Llama 3.2 Instruct (3B)": {
+                    "Cost per 1000 input tokens": "$0.0002",
+                    "Cost per 1000 output tokens": "$0.0002"
+                    }
+                },
+                "Mistral": {
+                    "Mistral 7B": {
+                    "Cost per 1000 input tokens": "$0.0002",
+                    "Cost per 1000 output tokens": "$0.00026"
+                    },
+                    "Mixtral 8*7B": {
+                    "Cost per 1000 input tokens": "$0.00059",
+                    "Cost per 1000 output tokens": "$0.00091"
+                    },
+                    "Mistral Large (24.02)": {
+                    "Cost per 1000 input tokens": "$0.0052",
+                    "Cost per 1000 output tokens": "$0.0156"
+                    }
+                }
+                },
+                "Europe (Frankfurt)": {
+                    "Amazon": {
+                        "Models": {
+                        "Titan Text G1 -Express": {
+                            "Cost per 1000 input tokens": "$0.0003",
+                            "Cost per 1000 output tokens": "$0.000863"
+                        }
+                        }
+                    },
+                    "Anthropic": {
+                    "Claude Instant": {
+                    "Cost per 1000 input tokens": "$0.0008",
+                    "Cost per 1000 output tokens": "$0.0024"
+                    },
+                    "Claude 2.0/2.1": {
+                    "Cost per 1000 input tokens": "$0.008",
+                    "Cost per 1000 output tokens": "$0.024"
+                    },
+                    "Claude 3 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    },
+                    "Claude 3.5 Sonnet": {
+                    "Cost per 1000 input tokens": "$0.003",
+                    "Cost per 1000 output tokens": "$0.015"
+                    },
+                    "Claude 3 Haiku": {
+                    "Cost per 1000 input tokens": "$0.00025",
+                    "Cost per 1000 output tokens": "$0.00125"
+                    }
+                },
+                "Llama 3.2": {
+                    "Llama 3.2 Instruct (1B)": {
+                    "Cost per 1000 input tokens": "$0.00013",
+                    "Cost per 1000 output tokens": "$0.00013"
+                    },
+                    "Llama 3.2 Instruct (3B)": {
+                    "Cost per 1000 input tokens": "$0.00019",
+                    "Cost per 1000 output tokens": "$0.00019"
+                    }
+                }
+                }
+            }
+            };
+
+        // Copy the existing initializeDropdowns, updateProviders, updateModels, updatePricing functions
+        function initializeDropdowns() {
+            const regionSelect = document.getElementById('regionSelect');
+            regionSelect.innerHTML = '<option value="">Select Region</option>';
+            Object.keys(pricingData.Regions).forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionSelect.appendChild(option);
+            });
+        }
+
+        function updateProviders() {
+            const regionSelect = document.getElementById('regionSelect');
+            const providerSelect = document.getElementById('providerSelect');
+            const modelSelect = document.getElementById('modelSelect');
+            
+            providerSelect.innerHTML = '<option value="">Select Provider</option>';
+            modelSelect.innerHTML = '<option value="">Select Model</option>';
+            
+            if (regionSelect.value) {
+                const providers = Object.keys(pricingData.Regions[regionSelect.value].Providers);
+                providers.forEach(provider => {
+                    const option = document.createElement('option');
+                    option.value = provider;
+                    option.textContent = provider;
+                    providerSelect.appendChild(option);
+                });
+                providerSelect.disabled = false;
+                modelSelect.disabled = true;
+            } else {
+                providerSelect.disabled = true;
+                modelSelect.disabled = true;
+            }
+        }
+
+        function updateModels() {
+            const regionSelect = document.getElementById('regionSelect');
+            const providerSelect = document.getElementById('providerSelect');
+            const modelSelect = document.getElementById('modelSelect');
+            
+            modelSelect.innerHTML = '<option value="">Select Model</option>';
+            
+            if (providerSelect.value) {
+                const models = Object.keys(pricingData.Regions[regionSelect.value]
+                    .Providers[providerSelect.value].Models);
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                });
+                modelSelect.disabled = false;
+            } else {
+                modelSelect.disabled = true;
+            }
+        }
+
+        function updatePricing() {
+            const regionSelect = document.getElementById('regionSelect');
+            const providerSelect = document.getElementById('providerSelect');
+            const modelSelect = document.getElementById('modelSelect');
+
+            if (modelSelect.value) {
+                const modelPricing = pricingData.Regions[regionSelect.value]
+                    .Providers[providerSelect.value]
+                    .Models[modelSelect.value];
+
+                document.getElementById('inputTokenPrice').value = 
+                    parseFloat(modelPricing["Cost per 1000 input tokens"].replace('$', ''));
+                document.getElementById('outputTokenPrice').value = 
+                    parseFloat(modelPricing["Cost per 1000 output tokens"].replace('$', ''));
+            }
+        }
+
+        // Remaining functions from the previous implementation
+        // (calculateGuardrailsCost, resetGuardrailsCalculator, 
+        //  calculateTextModelCost, resetTextModelCalculator,
+        //  calculateEmbeddingCost, resetEmbeddingCalculator)
+
+        function calculateGuardrailsCost() {
+            let inputTokens = parseInt(document.getElementById("inputTokens").value);
+            let outputTokens = parseInt(document.getElementById("outputTokens").value);
+            let requests = parseInt(document.getElementById("requests").value);
+            
+            // Validation
+            let hasError = false;
+            const inputTokensEl = document.getElementById("inputTokens");
+            const outputTokensEl = document.getElementById("outputTokens");
+            const requestsEl = document.getElementById("requests");
+
+            if (isNaN(inputTokens) || inputTokens < 1) {
+                inputTokensEl.classList.add('error');
+                inputTokensEl.nextElementSibling.textContent = "Please enter a positive integer";
+                hasError = true;
+            } else {
+                inputTokensEl.classList.remove('error');
+                inputTokensEl.nextElementSibling.textContent = "";
+            }
+
+            if (isNaN(outputTokens) || outputTokens < 1) {
+                outputTokensEl.classList.add('error');
+                outputTokensEl.nextElementSibling.textContent = "Please enter a positive integer";
+                hasError = true;
+            } else {
+                outputTokensEl.classList.remove('error');
+                outputTokensEl.nextElementSibling.textContent = "";
+            }
+
+            if (isNaN(requests) || requests < 1) {
+                requestsEl.classList.add('error');
+                requestsEl.nextElementSibling.textContent = "Please enter a positive integer";
+                hasError = true;
+            } else {
+                requestsEl.classList.remove('error');
+                requestsEl.nextElementSibling.textContent = "";
+            }
+
+            if (hasError) return;
+
+            let inputCharacters = inputTokens * 3.5;
+            let outputCharacters = outputTokens * 3.5;
+
+            let inputUnits = Math.ceil(inputCharacters / 1000);
+            let outputUnits = Math.ceil(outputCharacters / 1000);
+            let totalUnitsPerRequest = inputUnits + outputUnits;
+            let totalUnits = totalUnitsPerRequest * requests;
+
+            let contentFilterCost = (totalUnits * 0.15) / 1000;
+            let deniedTopicsCost = (totalUnits * 0.15) / 1000;
+            let contextualGroundingCost = (totalUnits * 0.1) / 1000;
+            let piiFilterCost = (totalUnits * 0.1) / 1000;
+            let totalCost = contentFilterCost + deniedTopicsCost + contextualGroundingCost + piiFilterCost;
+
+            document.getElementById("guardrails-results").innerHTML = `
+                <div class="result-item">
+                    <span>Content Filter Cost</span>
+                    <span>${contentFilterCost.toFixed(4)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Denied Topics Cost</span>
+                    <span>${deniedTopicsCost.toFixed(4)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Contextual Grounding Cost</span>
+                    <span>${contextualGroundingCost.toFixed(4)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>PII Filter Cost</span>
+                    <span>${piiFilterCost.toFixed(4)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Regex Filter Cost</span>
+                    <span>Free</span>
+                </div>
+                <div class="result-item">
+                    <span>Word Filter Cost</span>
+                    <span>Free</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Cost</span>
+                    <span>${totalCost.toFixed(4)} USD</span>
+                </div>
+            `;
+
+            document.getElementById("guardrails-detailed-breakdown").innerHTML = `
+                <div class="detailed-step">
+                    <h3>Step 1: Token to Character Conversion</h3>
+                    <p>Input Tokens Per Request: ${inputTokens} tokens × 3.5 = ${inputCharacters.toFixed(4)} characters</p>
+                    <p>Output Tokens Per Response: ${outputTokens} tokens × 3.5 = ${outputCharacters.toFixed(4)} characters</p>
+                </div>
+
+                <div class="detailed-step">
+                    <h3>Step 2: Units Calculation</h3>
+                    <p>Input Units Per Request: ${inputCharacters.toFixed(4)} characters ÷ 1000 = ${inputUnits} units (rounded up)</p>
+                    <p>Output Units Per Response: ${outputCharacters.toFixed(4)} characters ÷ 1000 = ${outputUnits} units (rounded up)</p>
+                    <p>Total Units: ${inputUnits} + ${outputUnits} = ${totalUnitsPerRequest} units</p>
+                    <p>Total Units per Month: ${totalUnitsPerRequest} units × ${requests} requests = ${totalUnits} units</p>
+                </div>
+
+                <div class="detailed-step">
+                    <h3>Step 3: Cost Calculation</h3>
+                    <p>Content Filter: ${totalUnits} units × $0.15 per 1000 units = ${contentFilterCost.toFixed(4)} USD</p>
+                    <p>Denied Topics: ${totalUnits} units × $0.15 per 1000 units = ${deniedTopicsCost.toFixed(4)} USD</p>
+                    <p>Contextual Grounding: ${totalUnits} units × $0.10 per 1000 units = ${contextualGroundingCost.toFixed(4)} USD</p>
+                    <p>PII Filter: ${totalUnits} units × $0.10 per 1000 units = ${piiFilterCost.toFixed(4)} USD</p>
+                </div>
+            `;
+
+            document.getElementById("guardrails-detailed-breakdown").style.display = "block";
+        }
+
+        function resetGuardrailsCalculator() {
+            document.getElementById("inputTokens").value = "";
+            document.getElementById("outputTokens").value = "";
+            document.getElementById("requests").value = "";
+            
+            // Remove error classes and messages
+            ["inputTokens", "outputTokens", "requests"].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('error');
+                el.nextElementSibling.textContent = "";
+            });
+
+            document.getElementById("guardrails-results").innerHTML = "";
+            document.getElementById("guardrails-detailed-breakdown").innerHTML = "";
+            document.getElementById("guardrails-detailed-breakdown").style.display = "none";
+        }
+
+        // Implement similar validation and error handling for other calculators
+        function calculateTextModelCost() {
+            if (!document.getElementById('modelSelect').value) {
+                alert("Please select a model first.");
+                return;
+            }
+
+            const inputTokens = parseFloat(document.getElementById('textInputTokens').value);
+            const outputTokens = parseFloat(document.getElementById('textOutputTokens').value);
+            const requestsPerMonth = parseFloat(document.getElementById('requestsPerMonth').value);
+            const inputTokenPrice = parseFloat(document.getElementById('inputTokenPrice').value);
+            const outputTokenPrice = parseFloat(document.getElementById('outputTokenPrice').value);
+
+            // Validation
+            let hasError = false;
+            const inputTokensEl = document.getElementById('textInputTokens');
+            const outputTokensEl = document.getElementById('textOutputTokens');
+            const requestsPerMonthEl = document.getElementById('requestsPerMonth');
+
+            if (isNaN(inputTokens) || inputTokens <= 0) {
+                inputTokensEl.classList.add('error');
+                document.getElementById('textInputTokensError').textContent = "Please enter a positive number";
+                hasError = true;
+            } else {
+                inputTokensEl.classList.remove('error');
+                document.getElementById('textInputTokensError').textContent = "";
+            }
+
+            if (isNaN(outputTokens) || outputTokens <= 0) {
+                outputTokensEl.classList.add('error');
+                document.getElementById('textOutputTokensError').textContent = "Please enter a positive number";
+                hasError = true;
+            } else {
+                outputTokensEl.classList.remove('error');
+                document.getElementById('textOutputTokensError').textContent = "";
+            }
+
+            if (isNaN(requestsPerMonth) || requestsPerMonth <= 0) {
+                requestsPerMonthEl.classList.add('error');
+                document.getElementById('requestsPerMonthError').textContent = "Please enter a positive number";
+                hasError = true;
+            } else {
+                requestsPerMonthEl.classList.remove('error');
+                document.getElementById('requestsPerMonthError').textContent = "";
+            }
+
+            if (hasError) return;
+
+            const totalInputCost = (inputTokenPrice / 1000) * inputTokens * requestsPerMonth;
+            const totalOutputCost = (outputTokenPrice / 1000) * outputTokens * requestsPerMonth;
+            const totalCost = totalInputCost + totalOutputCost;
+
+            const selectedModel = document.getElementById('modelSelect').value;
+            document.getElementById('text-model-result').innerHTML = `
+                <div class="result-item">
+                    <span>Monthly Input Token Cost</span>
+                    <span>${totalInputCost.toFixed(4)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Monthly Output Token Cost</span>
+                    <span>${totalOutputCost.toFixed(4)} USD</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Monthly Bedrock Cost</span>
+                    <span>${totalCost.toFixed(4)} USD</span>
+                </div>
+            `;
+
+            document.getElementById('text-model-result-details').innerHTML = `
+                <div class="detailed-step">
+                    <h3>Cost Calculation Details</h3>
+                    <p>Selected Model: ${selectedModel}</p>
+                    <p>Monthly Input Token Cost Calculation: (${inputTokenPrice} / 1000) × ${inputTokens} × ${requestsPerMonth} = ${totalInputCost.toFixed(4)} USD</p>
+                    <p>Monthly Output Token Cost Calculation: (${outputTokenPrice} / 1000) × ${outputTokens} × ${requestsPerMonth} = ${totalOutputCost.toFixed(4)} USD</p>
+                    <p>Total Monthly Bedrock Cost: ${totalInputCost.toFixed(4)} USD + ${totalOutputCost.toFixed(4)} USD = ${totalCost.toFixed(4)} USD</p>
+                </div>
+            `;
+        }
+
+        function resetTextModelCalculator() {
+            document.getElementById('regionSelect').selectedIndex = 0;
+            document.getElementById('providerSelect').innerHTML = '<option value="">Select Provider</option>';
+            document.getElementById('providerSelect').disabled = true;
+            document.getElementById('modelSelect').innerHTML = '<option value="">Select Model</option>';
+            document.getElementById('modelSelect').disabled = true;
+            
+            ['textInputTokens', 'textOutputTokens', 'requestsPerMonth'].forEach(id => {
+                const el = document.getElementById(id);
+                el.value = '';
+                el.classList.remove('error');
+                document.getElementById(id + 'Error').textContent = "";
+            });
+            
+            document.getElementById('text-model-result').innerHTML = '';
+            document.getElementById('text-model-result-details').innerHTML = '';
+        }
+
+        // function calculate
+        // Embedding Cost Calculator Functions
+        function calculateEmbeddingCost() {
+            const embedType = document.getElementById('embedType').value;
+            const modelType = document.getElementById('modelType').value;
+            const embedInputValue = parseFloat(document.getElementById('embedInputValue').value);
+
+            let embedTokenPrice;
+
+            // Set embedTokenPrice based on modelType
+            if (modelType === "amzonEv1") {
+                embedTokenPrice = 0.0001; // Amazon Titan Text Embedding price
+            } else if (modelType === "amzonEv2") {
+                embedTokenPrice = 0.00002; // Amazon Titan Text Embedding V2 price
+            } else if (modelType === "CoherePlain") {
+                embedTokenPrice = 0.0001; // Cohere Embed English price
+            } else if (modelType === "CohereMultiLingual") {
+                embedTokenPrice = 0.0001; // Cohere Embed Multilingual price
+            } else {
+                alert("Invalid model type selected.");
+                return;
+            }
+
+            let totalEmbedCost;
+            let calculationDetails = '';
+
+            if (embedType === 'gb') {
+                const totalTokensFromGB = embedInputValue * 161000000; 
+                totalEmbedCost = (embedTokenPrice / 1000) * totalTokensFromGB;
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${totalTokensFromGB} tokens = ${totalEmbedCost.toFixed(4)} USD`;
+            } else if (embedType === 'millionTokens') {
+                totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue * 1000000; 
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} million tokens = ${totalEmbedCost.toFixed(4)} USD`;
+            } else if (embedType === 'tokens') {
+                totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue;
+                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} tokens = ${totalEmbedCost.toFixed(4)} USD`;
+            }
+
+            document.getElementById('embedding-result').innerHTML = `
+                <div class="result-item">
+                    <span>Selected Model</span>
+                    <span>${document.getElementById('modelType').options[document.getElementById('modelType').selectedIndex].text}</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Monthly Embedding Cost</span>
+                    <span>${totalEmbedCost.toFixed(4)} USD</span>
+                </div>
+            `;
+
+            document.getElementById('embedding-result-details').innerHTML = `
+                <div class="detailed-step">
+                    <h3>Cost Calculation Details</h3>
+                    <p>${calculationDetails}</p>
+                </div>
+            `;
+        }
+
+        function resetEmbeddingCalculator() {
+            document.getElementById('modelType').selectedIndex = 0;
+            document.getElementById('embedType').selectedIndex = 0;
+            document.getElementById('embedInputValue').value = '';
+            document.getElementById('embedding-result').innerHTML = '';
+            document.getElementById('embedding-result-details').innerHTML = '';
+        }
+
+        // Initialize dropdowns on page load
+        window.onload = function() {
+            initializeDropdowns();
+        };
+    </script>
+
+    <!-- <div style="text-align: center; margin-top: 20px; color: #e5eceb; padding: 10px;">
+        <p>Developed by <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" style="color: #e5eceb;">Aditya</a>. Please verify cost estimates prior to implementation.</p>
+    </div> -->
+
+     <footer style="text-align: center; padding: 5px; background-color: #222; color: #e5eceb; width: 100%; position: fixed; bottom: 0; left: 0; font-size: 12px;">
+        <p style="margin: 0;">
+            Developed by 
+            <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" style="color: #e5eceb; text-decoration: none;">
+                Aditya
+            </a>. Please verify cost estimates prior to implementation.
+        </p>
+    </footer>
+</body>
+</html>
