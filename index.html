@@ -1,129 +1,258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amazon Bedrock Cost Calculator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #1a73e8;
-            --secondary-color: #34a853;
-            --background-color: #000033;
-            --card-color: #81e0dc;
-            --text-color: #171717;
-            --border-color: #aa9e9e;
-            --hover-color: #185abc;
-            --error-color: #ea4335;
+            /* Light theme variables */
+            --primary-color: #2563eb;
+            --secondary-color: #10b981;
+            --background-color: #f1f5f9;
+            --card-color: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --hover-color: #1d4ed8;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s ease;
+            --font-size-sm: 0.75rem;
+            --font-size-base: 0.875rem;
+            --font-size-lg: 1rem;
+            
+            /* Responsive variables */
+            --container-padding: 0.75rem;
+            --grid-gap: 0.5rem;
+            --input-min-width: 200px;
+            --tab-button-padding: 0.375rem 0.75rem;
+            --results-container-width: 40%;
+            --details-container-width: 55%;
+            --input-group-margin: 0.5rem;
         }
 
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #34d399;
+            --background-color: #0f172a;
+            --card-color: #1e293b;
+            --text-color: #f1f5f9;
+            --border-color: #334155;
+            --hover-color: #60a5fa;
+            --error-color: #f87171;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Add smooth transition for theme switching */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
-            line-height: 1;
+            line-height: 1.4;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
+            padding: var(--container-padding);
+            margin: 0;
         }
 
         .calculator-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             background-color: var(--card-color);
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(210, 206, 206, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 2rem);
+            padding: var(--container-padding);
+            gap: var(--grid-gap);
         }
 
         .tab-buttons {
             display: flex;
             background-color: var(--background-color);
+            padding: 0.25rem;
+            gap: 0.25rem;
             border-bottom: 1px solid var(--border-color);
         }
 
         .tab-button {
-            flex: 1;
-            padding: 5px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
+            padding: var(--tab-button-padding);
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: var(--font-size-sm);
             color: var(--text-color);
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
         .tab-button:hover {
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: var(--card-color);
         }
 
         .tab-button.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
         }
 
         .tab-content {
+            flex: 1;
             display: none;
-            padding: 10px;
+            padding: 1rem;
+            overflow-y: auto;
+            height: calc(100vh - 120px);
         }
 
         .tab-content.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
 
         .calculator-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0.25rem 0;
             text-align: center;
-            margin-bottom: 10px;
+        }
+
+        .inputs-container {
+            margin-bottom: 0.1rem;
+        }
+
+        .button-group {
+            margin: var(--section-margin) 0;
+            gap: 0.1rem;
+        }
+
+        .results-details-container {
+            display: flex;
+            gap: var(--grid-gap);
+            flex: 1;
+            min-height: 0;
+            margin-top: var(--section-margin);
+        }
+
+        .results-container {
+            flex: 0 0 40%;
+            background: var(--card-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .detailed-breakdown {
+            flex: 0 0 55%;
+            background: var(--card-color);
+            border-radius: 0.5rem;
+            padding: 0.7rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .detailed-step {
+            background: var(--background-color);
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .detailed-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .detailed-step h4 {
             color: var(--primary-color);
-            font-size: 1.5rem;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .detailed-step p {
+            font-size: var(--font-size-sm);
+            line-height: 1;
+            margin: 0.125rem 0;
+            color: var(--text-color);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.375rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+            margin-bottom: 0.25rem;
         }
 
         .input-group {
-            margin-bottom: 10px;
+            margin-bottom: var(--input-group-margin);
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
             color: var(--text-color);
+            font-size: var(--font-size-sm);
         }
 
         .input-group input,
         .input-group select {
             width: 100%;
-            padding: 5px;
+            padding: 0.375rem 0.5rem;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+            border-radius: 0.375rem;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            font-size: var(--font-size-sm);
+            transition: var(--transition);
+            margin: 0.25rem 0;
         }
 
         .input-group input:focus,
         .input-group select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .input-group .error {
+            margin-top: 0.25rem;
+            font-size: var(--font-size-sm);
             color: var(--error-color);
-            font-size: 0.875rem;
-            margin-top: 5px;
-            display: none;
+            min-height: 1rem;
         }
 
         .input-group input.error,
         .input-group select.error {
             border-color: var(--error-color);
+            background-color: rgba(239, 68, 68, 0.05);
         }
 
         .input-group input.error + .error,
@@ -131,21 +260,15 @@
             display: block;
         }
 
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
         .btn {
             flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: var(--font-size-sm);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            border: none;
         }
 
         .btn-calculate {
@@ -155,168 +278,876 @@
 
         .btn-calculate:hover {
             background-color: var(--hover-color);
+            transform: translateY(-1px);
         }
 
         .btn-reset {
-            background-color: var(--error-color);
-            color: white;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
         }
 
         .btn-reset:hover {
-            background-color: #c5221f;
+            background-color: var(--border-color);
+            transform: translateY(-1px);
         }
 
-        .results-container {
-            background-color: #b1acac;
-            border-radius: 6px;
-            padding: 10px;
-            margin-top: 10px;
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+            padding: 0.375rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .copy-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .copy-success {
+            position: absolute;
+            top: 0.5rem;
+            right: 3rem;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.375rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: var(--font-size-sm);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1400px) {
+            :root {
+                --container-padding: 0.875rem;
+                --grid-gap: 0.625rem;
+                --input-min-width: 180px;
+                --results-container-width: 45%;
+                --details-container-width: 50%;
+            }
+            
+            .calculator-container {
+                max-width: 1100px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            :root {
+                --container-padding: 0.75rem;
+                --grid-gap: 0.5rem;
+                --input-min-width: 160px;
+                --results-container-width: 48%;
+                --details-container-width: 48%;
+            }
+            
+            .calculator-container {
+                max-width: 1000px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            :root {
+                --container-padding: 0.5rem;
+                --grid-gap: 0.375rem;
+                --input-min-width: 140px;
+                --tab-button-padding: 0.375rem 0.75rem;
+                --input-group-margin: 0.375rem;
+                --section-margin: 0.5rem;
+            }
+            
+            .calculator-container {
+                max-width: 900px;
+            }
+            
+            .results-container,
+            .detailed-breakdown {
+                flex: 1;
+                max-height: none;
+                width: 100%;
+            }
+            
+            .results-details-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .tab-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tab-button {
+                flex: 1 1 auto;
+                min-width: 150px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --container-padding: 0.375rem;
+                --grid-gap: 0.25rem;
+                --input-min-width: 100%;
+                --tab-button-padding: 0.25rem 0.5rem;
+                --input-group-margin: 0.25rem;
+                --section-margin: 0.375rem;
+            }
+            
+            .calculator-container {
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .inputs-container {
+                padding: 0.5rem;
+            }
+            
+            .input-group {
+                margin-bottom: 0.75rem;
+            }
+            
+            .dropdown-row,
+            .input-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .tab-button {
+                font-size: 0.75rem;
+                padding: var(--tab-button-padding);
+            }
+            
+            .tab-button i {
+                margin-right: 0.25rem;
+            }
+            
+            .results-container,
+            .detailed-breakdown {
+                padding: 0.5rem;
+            }
+            
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            
+            .detailed-step {
+                padding: 0.375rem;
+            }
+            
+            .detailed-step h3 {
+                font-size: 0.875rem;
+            }
+            
+            .detailed-step p {
+                font-size: 0.8125rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --container-padding: 0.25rem;
+                --grid-gap: 0.125rem;
+                --input-min-width: 120px;
+                --input-group-margin: 0.125rem;
+                --section-margin: 0.25rem;
+            }
+            
+            .calculator-container {
+                border-radius: 0.375rem;
+            }
+            
+            .tab-button {
+                min-width: 120px;
+                font-size: 0.7rem;
+            }
+            
+            .calculator-title {
+                font-size: 1rem;
+            }
+            
+            .input-group label {
+                font-size: 0.75rem;
+            }
+            
+            .input-group input,
+            .input-group select {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.375rem;
+            }
+        }
+
+        /* Add landscape mode optimization */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .calculator-container {
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .tab-buttons {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background-color: var(--background-color);
+            }
+            
+            .results-details-container {
+                max-height: calc(100vh - 200px);
+                overflow-y: auto;
+            }
+        }
+
+        /* Add high-DPI screen optimization */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .calculator-container {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Add print styles */
+        @media print {
+            .calculator-container {
+                box-shadow: none;
+                border: 1px solid var(--border-color);
+            }
+            
+            .theme-toggle,
+            .btn {
+                display: none;
+            }
+            
+            .results-container,
+            .detailed-breakdown {
+                max-height: none;
+                overflow: visible;
+            }
+        }
+
+        /* Update footer styles */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            padding: 0.375rem;
+            font-size: var(--font-size-sm);
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            z-index: 999;
+        }
+
+        footer p {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            line-height: 1;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0 0.25rem;
+        }
+
+        .footer-note {
+            color: var(--text-color);
+            opacity: 0.8;
+            padding-left: 0.25rem;
+        }
+
+        /* Update theme toggle position to account for smaller footer */
+        .theme-toggle {
+            bottom: 0.75rem;
+            right: 0.75rem;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            background-color: var(--card-color);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .theme-toggle i {
+            font-size: var(--font-size-base);
+            color: var(--primary-color);
+        }
+
+        /* Add smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Update error styles */
+        .error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Add input styling for number inputs */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        input[type="number"].error {
+            border-color: var(--error-color);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        /* Update the guardrails-inputs CSS */
+        .guardrails-inputs {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.5rem;
+            margin: 0 1rem;
+        }
+
+        .guardrails-inputs .input-group {
+            flex: 1;
+            margin-bottom: 0;
+            min-width: 200px;
+        }
+
+        .guardrails-inputs .input-group input {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .guardrails-inputs {
+                flex-direction: column;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+            
+            .guardrails-inputs .input-group {
+                width: 100%;
+            }
+        }
+
+        /* Add these CSS styles */
+        .text-model-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin: 0 1rem;
+        }
+
+        .dropdown-row,
+        .input-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .dropdown-row .input-group,
+        .input-row .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .dropdown-row select,
+        .input-row input[type="number"] {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .dropdown-row,
+            .input-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .dropdown-row .input-group,
+            .input-row .input-group {
+                width: 100%;
+            }
+        }
+
+        /* Add a container for the results and details */
+        .results-details-container {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            min-height: 0;
+            margin-top: 0;
+        }
+
+        .detailed-step {
+            background: var(--background-color);
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .detailed-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .detailed-step h3 {
+            color: var(--primary-color);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .detailed-step p {
+            font-size: var(--font-size-sm);
+            line-height: 1.3;
+            margin: 0.125rem 0;
+            color: var(--text-color);
         }
 
         .result-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            align-items: center;
+            padding: 0.375rem;
             border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-size-sm);
+            margin-bottom: 0.25rem;
         }
 
-        .result-item:last-child {
-            border-bottom: none;
-            font-weight: 600;
-        }
-
-        .detailed-breakdown {
-            margin-top: 10px;
-            background-color: #b1acac;
-            border-radius: 6px;
-            padding: 15px;
-        }
-
-        .detailed-step {
-            margin-bottom: 15px;
-        }
-
-        .detailed-step h3 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 600px) {
-            .tab-buttons {
+        @media (max-width: 992px) {
+            .results-details-container {
                 flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .results-container,
+            .detailed-breakdown {
+                flex: 1;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tab-content {
+                padding: 0.75rem;
+            }
+            
+            .detailed-step {
+                padding: 0.375rem;
+            }
+            
+            .detailed-step h3 {
+                font-size: var(--font-size-sm);
+                margin-bottom: 0.125rem;
+            }
+            
+            .detailed-step p {
+                font-size: var(--font-size-sm);
+                line-height: 1.2;
+                margin: 0.125rem 0;
+            }
+        }
+
+        /* Update the button group position */
+        .button-group {
+        }
+
+        @media (max-width: 768px) {
+            .detailed-step {
+                padding: 0.75rem;
+            }
+            
+            .detailed-step h3 {
+                font-size: 0.875rem;
+            }
+            
+            .detailed-step p {
+                font-size: 0.8125rem;
+            }
+        }
+
+        /* Update the button group position */
+        .button-group {
+            clear: both;
+            margin-top: 1rem;
+        }
+
+        /* Update text model and embedding model inputs container */
+        .text-model-inputs,
+        .embedding-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin: 0 1rem;
+        }
+
+        /* Update dropdown and input rows */
+        .dropdown-row,
+        .input-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-row .input-group,
+        .input-row .input-group {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Update embedding model specific styles */
+        #embedding-tab .input-group {
+            margin-bottom: 0.5rem;
+        }
+
+        #embedding-tab .input-group label {
+            margin-bottom: 0.25rem;
+        }
+
+        #embedding-tab .input-group input,
+        #embedding-tab .input-group select {
+            margin: 0.25rem 0;
+        }
+
+        /* Update text model specific styles */
+        #text-model-tab .input-group {
+            margin-bottom: 0.5rem;
+        }
+
+        #text-model-tab .input-group label {
+            margin-bottom: 0.25rem;
+        }
+
+        #text-model-tab .input-group input,
+        #text-model-tab .input-group select {
+            margin: 0.25rem 0;
+        }
+
+        /* Update responsive styles for both sections */
+        @media (max-width: 992px) {
+            .text-model-inputs,
+            .embedding-inputs {
+                padding: 0.375rem;
+                margin: 0 0.75rem;
             }
 
-            .tab-button {
-                border-bottom: none;
-                border-right: 3px solid transparent;
+            .dropdown-row,
+            .input-row {
+                gap: 0.75rem;
+                margin-bottom: 0.375rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .text-model-inputs,
+            .embedding-inputs {
+                padding: 0.25rem;
+                margin: 0 0.5rem;
             }
 
-            .tab-button.active {
-                border-bottom: none;
-                border-right-color: var(--primary-color);
+            .dropdown-row,
+            .input-row {
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .dropdown-row .input-group,
+            .input-row .input-group {
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .text-model-inputs,
+            .embedding-inputs {
+                padding: 0.125rem;
+                margin: 0 0.25rem;
+            }
+
+            .dropdown-row,
+            .input-row {
+                gap: 0.25rem;
+            }
+        }
+
+        /* Update embedding model styles */
+        .embedding-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin: 0 1rem;
+        }
+
+        .embedding-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .embedding-row .input-group {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive styles for embedding section */
+        @media (max-width: 992px) {
+            .embedding-row {
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .embedding-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .embedding-row .input-group {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .embedding-inputs {
+                padding: 0.25rem;
+                margin: 0 0.5rem;
+            }
+
+            .embedding-row {
+                gap: 0.25rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="calculator-container">
-        <!-- <div class="tab-buttons">
-            <div class="tab-button active" onclick="switchTab('text-model')">Text Model Cost</div>
-            <div class="tab-button" onclick="switchTab('embedding')">Embedding Cost</div>
-            <div class="tab-button" onclick="switchTab('guardrails')">Guardrails Cost</div>
-        </div> -->
         <div class="tab-buttons">
-            <div class="tab-button active" onclick="switchTab('text-model')" style="color: white; font-weight: bold;">Text Model Calculator</div>
-            <div class="tab-button" onclick="switchTab('embedding')" style="color: white; font-weight: bold;">Embedding Model Calculator</div>
-            <div class="tab-button" onclick="switchTab('guardrails')" style="color: white; font-weight: bold;">Guardrails Calculator</div>
+            <div class="tab-button active" onclick="switchTab('text-model')">
+                <i class="fas fa-calculator"></i>
+                <span>Text Model Calculator</span>
+            </div>
+            <div class="tab-button" onclick="switchTab('embedding')">
+                <i class="fas fa-code"></i>
+                <span>Embedding Model Calculator</span>
+            </div>
+            <div class="tab-button" onclick="switchTab('guardrails')">
+                <i class="fas fa-shield-alt"></i>
+                <span>Guardrails Calculator</span>
+            </div>
         </div>
         
 
         <!-- Text Model Cost Calculator -->
         <div id="text-model-tab" class="tab-content active">
-            <h1 class="calculator-title">Text Based LLM Model On-Demand Cost Calculator</h1>
+            <h1 class="calculator-title">
+                <i class="fas fa-calculator"></i>
+                Text Based LLM Model On-Demand Cost Calculator
+            </h1>
 
-            <div class="input-group">
-                <label>Region</label>
-                <select id="regionSelect" onchange="updateProviders()">
-                    <option value="">Select Region</option>
-                </select>
-                <div class="error">Please select a region</div>
-            </div>
+            <div class="inputs-container text-model-inputs">
+                <!-- First row: Dropdowns -->
+                <div class="dropdown-row">
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-globe"></i>
+                            Region
+                        </label>
+                        <select id="regionSelect" onchange="updateProviders()">
+                            <option value="">Select Region</option>
+                        </select>
+                        <div class="error">Please select a region</div>
+                    </div>
 
-            <div class="input-group">
-                <label>Provider</label>
-                <select id="providerSelect" onchange="updateModels()" disabled>
-                    <option value="">Select Provider</option>
-                </select>
-                <div class="error">Please select a provider</div>
-            </div>
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-server"></i>
+                            Provider
+                        </label>
+                        <select id="providerSelect" onchange="updateModels()" disabled>
+                            <option value="">Select Provider</option>
+                        </select>
+                        <div class="error">Please select a provider</div>
+                    </div>
 
-            <div class="input-group">
-                <label>Model</label>
-                <select id="modelSelect" onchange="updatePricing()" disabled>
-                    <option value="">Select Model</option>
-                </select>
-                <div class="error">Please select a model</div>
-            </div>
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-cube"></i>
+                            Model
+                        </label>
+                        <select id="modelSelect" onchange="updatePricing()" disabled>
+                            <option value="">Select Model</option>
+                        </select>
+                        <div class="error">Please select a model</div>
+                    </div>
+                </div>
 
-            <input type="hidden" id="inputTokenPrice">
-            <input type="hidden" id="outputTokenPrice">
+                <!-- Second row: Input boxes -->
+                <div class="input-row">
+                    <input type="hidden" id="inputTokenPrice">
+                    <input type="hidden" id="outputTokenPrice">
 
-            <div class="input-group">
-                <label>Total No. of Input Tokens Per Request</label>
-                <input type="text" id="textInputTokens" placeholder="Enter input tokens" oninput="validateInput(this)">
-                <div class="error" id="textInputTokensError"></div>
-            </div>
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-keyboard"></i>
+                            Input Tokens
+                        </label>
+                        <input type="number" 
+                               id="textInputTokens" 
+                               placeholder="Enter input tokens" 
+                               min="1" 
+                               step="1"
+                               oninput="validateIntegerInput(this)"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <div class="error" id="textInputTokensError"></div>
+                    </div>
 
-            <div class="input-group">
-                <label>Total No. of Output Tokens Per Request</label>
-                <input type="text" id="textOutputTokens" placeholder="Enter output tokens" oninput="validateInput(this)">
-                <div class="error" id="textOutputTokensError"></div>
-            </div>
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-keyboard"></i>
+                            Output Tokens
+                        </label>
+                        <input type="number" 
+                               id="textOutputTokens" 
+                               placeholder="Enter output tokens" 
+                               min="1" 
+                               step="1"
+                               oninput="validateIntegerInput(this)"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <div class="error" id="textOutputTokensError"></div>
+                    </div>
 
-            <div class="input-group">
-                <label>Total Number of Requests per Month</label>
-                <input type="text" id="requestsPerMonth" placeholder="Enter requests per month" oninput="validateInput(this)">
-                <div class="error" id="requestsPerMonthError"></div>
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-sync"></i>
+                            Requests per Month
+                        </label>
+                        <input type="number" 
+                               id="requestsPerMonth" 
+                               placeholder="Enter requests per month" 
+                               min="1" 
+                               step="1"
+                               oninput="validateIntegerInput(this)"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <div class="error" id="requestsPerMonthError"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="button-group">
-                <button class="btn btn-calculate" onclick="calculateTextModelCost()">Calculate Text Model Cost</button>
-                <button class="btn btn-reset" onclick="resetTextModelCalculator()">Reset</button>
+                <button class="btn btn-calculate" onclick="calculateTextModelCost()">
+                    <i class="fas fa-calculator"></i>
+                    Calculate Cost
+                </button>
+                <button class="btn btn-reset" onclick="resetTextModelCalculator()">
+                    <i class="fas fa-redo"></i>
+                    Reset
+                </button>
             </div>
 
-            <div id="text-model-result" class="results-container"></div>
-            <div id="text-model-result-details" class="detailed-breakdown"></div>
+            <div class="results-details-container">
+                <div id="text-model-result" class="results-container"></div>
+                <div id="text-model-result-details" class="detailed-breakdown"></div>
+            </div>
         </div>
 
         <!-- Embedding Model Cost Calculator -->
         <div id="embedding-tab" class="tab-content">
             <h1 class="calculator-title">Embedding Based LLM Model On-Demand Cost Calculator</h1>
 
-            <div class="input-group">
-                <label>Select Embedding Model</label>
-                <select id="modelType">
-                    <option value="amzonEv1">Amazon Titan Text Embedding v1</option>
-                    <option value="amzonEv2">Amazon Titan Text Embedding v2</option>
-                    <option value="CoherePlain">Cohere Embed English</option>
-                    <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
-                </select>
-            </div>
+            <div class="inputs-container embedding-inputs">
+                <div class="embedding-row">
+                    <div class="input-group">
+                        <label>Select Embedding Model</label>
+                        <select id="modelType">
+                            <option value="amzonEv1">Amazon Titan Text Embedding v1</option>
+                            <option value="amzonEv2">Amazon Titan Text Embedding v2</option>
+                            <option value="CoherePlain">Cohere Embed English</option>
+                            <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
+                        </select>
+                    </div>
 
-            <div class="input-group">
-                <label>Select Input Type</label>
-                <select id="embedType">
-                    <option value="gb">Total Data Size in GB</option>
-                    <option value="millionTokens">Total Number of Tokens in Million</option>
-                    <option value="tokens">Total Number of Tokens</option>
-                </select>
-            </div>
+                    <div class="input-group">
+                        <label>Select Input Type</label>
+                        <select id="embedType">
+                            <option value="gb">Total Data Size in GB</option>
+                            <option value="millionTokens">Total Number of Tokens in Million</option>
+                            <option value="tokens">Total Number of Tokens</option>
+                        </select>
+                    </div>
 
-            <div class="input-group">
-                <label>Enter Value</label>
-                <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)">
-                <div class="error" id="embedInputValueError"></div>
+                    <div class="input-group">
+                        <label>Enter Value</label>
+                        <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)">
+                        <div class="error" id="embedInputValueError"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="button-group">
@@ -324,30 +1155,34 @@
                 <button class="btn btn-reset" onclick="resetEmbeddingCalculator()">Reset</button>
             </div>
 
-            <div id="embedding-result" class="results-container"></div>
-            <div id="embedding-result-details" class="detailed-breakdown"></div>
+            <div class="results-details-container">
+                <div id="embedding-result" class="results-container"></div>
+                <div id="embedding-result-details" class="detailed-breakdown"></div>
+            </div>
         </div>
 
         <!-- Guardrails Cost Calculator -->
         <div id="guardrails-tab" class="tab-content">
             <h1 class="calculator-title">Amazon Bedrock Guardrails On-Demand Cost Calculator</h1>
             
-            <div class="input-group">
-                <label for="inputTokens">Input Tokens Per Request</label>
-                <input type="number" id="inputTokens" placeholder="Enter input tokens" min="1">
-                <div class="error">Please enter a positive integer</div>
-            </div>
+            <div class="inputs-container guardrails-inputs">
+                <div class="input-group">
+                    <label for="inputTokens">Input Tokens Per Request</label>
+                    <input type="number" id="inputTokens" placeholder="Enter input tokens" min="1">
+                    <div class="error">Please enter a positive integer</div>
+                </div>
 
-            <div class="input-group">
-                <label for="outputTokens">Output Tokens Per Request</label>
-                <input type="number" id="outputTokens" placeholder="Enter output tokens" min="1">
-                <div class="error">Please enter a positive integer</div>
-            </div>
+                <div class="input-group">
+                    <label for="outputTokens">Output Tokens Per Request</label>
+                    <input type="number" id="outputTokens" placeholder="Enter output tokens" min="1">
+                    <div class="error">Please enter a positive integer</div>
+                </div>
 
-            <div class="input-group">
-                <label for="requests">Total Number of Requests Per Month</label>
-                <input type="number" id="requests" placeholder="Enter requests per hour" min="1">
-                <div class="error">Please enter a positive integer</div>
+                <div class="input-group">
+                    <label for="requests">Total Number of Requests Per Month</label>
+                    <input type="number" id="requests" placeholder="Enter requests per hour" min="1">
+                    <div class="error">Please enter a positive integer</div>
+                </div>
             </div>
 
             <div class="button-group">
@@ -355,11 +1190,28 @@
                 <button class="btn btn-reset" onclick="resetGuardrailsCalculator()">Reset</button>
             </div>
 
-            <div id="guardrails-results" class="results-container"></div>
-            <div id="guardrails-detailed-breakdown" class="detailed-breakdown" style="display:none;"></div>
+            <div class="results-details-container">
+                <div id="guardrails-results" class="results-container"></div>
+                <div id="guardrails-detailed-breakdown" class="detailed-breakdown"></div>
+            </div>
         </div>
 
     </div>
+
+    <!-- Update footer HTML -->
+    <footer>
+        <p>
+            Developed by 
+            <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" rel="noopener noreferrer">
+                Aditya Kumar
+            </a>
+            <span class="footer-note">• Please verify cost estimates prior to implementation</span>
+        </p>
+    </footer>
+
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <script>
         // Tab Switching Function
@@ -375,22 +1227,71 @@
             // Add active class to selected tab and tab button
             document.getElementById(tabName + '-tab').classList.add('active');
             document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // Don't clear results when switching tabs
+            // Only clear results when explicitly resetting or refreshing the page
         }
 
-        // Validation Function
-        function validateInput(input) {
+        // Function to clear all results - now only used on page load
+        function clearResults() {
+            const resultElements = [
+                'text-model-result',
+                'text-model-result-details',
+                'embedding-result',
+                'embedding-result-details',
+                'guardrails-results',
+                'guardrails-detailed-breakdown'
+            ];
+            
+            resultElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '';
+                }
+            });
+        }
+
+        // Initialize dropdowns and clear results only on page load
+        window.onload = function() {
+            initializeDropdowns();
+            clearResults(); // Clear results only on initial page load
+        };
+
+        // Update the calculation functions to handle results display
+        function updateResults(containerId, content) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = content;
+                // Ensure smooth scrolling to the results
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Updated validation function for positive integers
+        function validateIntegerInput(input) {
             const errorElement = document.getElementById(input.id + 'Error');
             const value = input.value;
-            const positiveNumberRegex = /^(0|[1-9]\d*)(\.\d+)?$/;
-
-            if (value === '' || positiveNumberRegex.test(value)) {
-                errorElement.textContent = "";
-                input.classList.remove('error');
-            } else {
-                errorElement.textContent = "Please enter a positive number.";
+            
+            // Remove any non-numeric characters
+            input.value = value.replace(/[^0-9]/g, '');
+            
+            // Check if the value is empty or not a positive integer
+            if (input.value === '' || parseInt(input.value) <= 0) {
+                errorElement.textContent = "Please enter a positive integer";
                 input.classList.add('error');
+                return false;
             }
-            input.value = value.replace(/[^0-9.]/g, '');
+            
+            // Check if the value is too large (optional, adjust max value as needed)
+            if (parseInt(input.value) > 1000000000) {
+                errorElement.textContent = "Value is too large. Please enter a smaller number";
+                input.classList.add('error');
+                return false;
+            }
+            
+            errorElement.textContent = "";
+            input.classList.remove('error');
+            return true;
         }
         
 
@@ -771,8 +1672,8 @@
                         "Cost per 1000 output tokens": "$0.0007"
                         },
                         "Mistral Large (24.02)": {
-                        "Cost per 1000 input tokens": "$0.004",
-                        "Cost per 1000 output tokens": "$0.012"
+                        "Cost per 1000 input tokens": "$0.0052",
+                        "Cost per 1000 output tokens": "$0.0156"
                         },
                         "Mistral Large 2 (24.07)": {
                         "Cost per 1000 input tokens": "$0.002",
@@ -1314,6 +2215,10 @@
             let totalCost = contentFilterCost + deniedTopicsCost + contextualGroundingCost + piiFilterCost;
 
             document.getElementById("guardrails-results").innerHTML = `
+                <button class="copy-button" onclick="copyResults('guardrails-results')" title="Copy results">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="copy-success">Copied!</div>
                 <div class="result-item">
                     <span>Content Filter Cost</span>
                     <span>${contentFilterCost.toFixed(4)} USD</span>
@@ -1345,30 +2250,83 @@
             `;
 
             document.getElementById("guardrails-detailed-breakdown").innerHTML = `
+                <button class="copy-button" onclick="copyResults('guardrails-detailed-breakdown')" title="Copy details">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="copy-success">Copied!</div>
                 <div class="detailed-step">
-                    <h3>Step 1: Token to Character Conversion</h3>
-                    <p>Input Tokens Per Request: ${inputTokens} tokens × 3.5 = ${inputCharacters.toFixed(4)} characters</p>
-                    <p>Output Tokens Per Response: ${outputTokens} tokens × 3.5 = ${outputCharacters.toFixed(4)} characters</p>
+                    <h3>Token to Character Conversion</h3>
+                    <p>Input: ${inputTokens} tokens × 3.5 = ${inputCharacters.toFixed(4)} characters</p>
+                    <p>Output: ${outputTokens} tokens × 3.5 = ${outputCharacters.toFixed(4)} characters</p>
                 </div>
 
                 <div class="detailed-step">
-                    <h3>Step 2: Units Calculation</h3>
-                    <p>Input Units Per Request: ${inputCharacters.toFixed(4)} characters ÷ 1000 = ${inputUnits} units (rounded up)</p>
-                    <p>Output Units Per Response: ${outputCharacters.toFixed(4)} characters ÷ 1000 = ${outputUnits} units (rounded up)</p>
-                    <p>Total Units: ${inputUnits} + ${outputUnits} = ${totalUnitsPerRequest} units</p>
+                    <h3>Units Calculation</h3>
+                    <p>Input Units: ${inputCharacters.toFixed(4)} ÷ 1000 = ${inputUnits} units</p>
+                    <p>Output Units: ${outputCharacters.toFixed(4)} ÷ 1000 = ${outputUnits} units</p>
                     <p>Total Units per Month: ${totalUnitsPerRequest} units × ${requests} requests = ${totalUnits} units</p>
                 </div>
 
                 <div class="detailed-step">
-                    <h3>Step 3: Cost Calculation</h3>
-                    <p>Content Filter: ${totalUnits} units × $0.15 per 1000 units = ${contentFilterCost.toFixed(4)} USD</p>
-                    <p>Denied Topics: ${totalUnits} units × $0.15 per 1000 units = ${deniedTopicsCost.toFixed(4)} USD</p>
-                    <p>Contextual Grounding: ${totalUnits} units × $0.10 per 1000 units = ${contextualGroundingCost.toFixed(4)} USD</p>
-                    <p>PII Filter: ${totalUnits} units × $0.10 per 1000 units = ${piiFilterCost.toFixed(4)} USD</p>
+                    <h3>Cost Breakdown</h3>
+                    <p>Content Filter: ${totalUnits} × $0.15/1000 = ${contentFilterCost.toFixed(4)} USD</p>
+                    <p>Denied Topics: ${totalUnits} × $0.15/1000 = ${deniedTopicsCost.toFixed(4)} USD</p>
+                    <p>Contextual Grounding: ${totalUnits} × $0.10/1000 = ${contextualGroundingCost.toFixed(4)} USD</p>
+                    <p>PII Filter: ${totalUnits} × $0.10/1000 = ${piiFilterCost.toFixed(4)} USD</p>
                 </div>
             `;
 
             document.getElementById("guardrails-detailed-breakdown").style.display = "block";
+        }
+
+        // Add copy functionality
+        function copyResults(elementId) {
+            const element = document.getElementById(elementId);
+            let formattedContent = '';
+            
+            // Remove copy button and success message from the content
+            const contentToCopy = element.cloneNode(true);
+            const copyButton = contentToCopy.querySelector('.copy-button');
+            const successMessage = contentToCopy.querySelector('.copy-success');
+            if (copyButton) copyButton.remove();
+            if (successMessage) successMessage.remove();
+            
+            if (elementId.includes('result')) {
+                // Format for results
+                const items = contentToCopy.querySelectorAll('.result-item');
+                items.forEach(item => {
+                    const spans = item.querySelectorAll('span');
+                    if (spans.length === 2) {
+                        formattedContent += `${spans[0].textContent.trim()}: ${spans[1].textContent.trim()}\n`;
+                    }
+                });
+            } else if (elementId.includes('detailed-breakdown') || elementId.includes('result-details')) {
+                // Format for detailed breakdown
+                const steps = contentToCopy.querySelectorAll('.detailed-step');
+                steps.forEach(step => {
+                    const title = step.querySelector('h3');
+                    if (title) {
+                        formattedContent += `${title.textContent.trim()}\n`;
+                    }
+                    const paragraphs = step.querySelectorAll('p');
+                    paragraphs.forEach(p => {
+                        formattedContent += `${p.textContent.trim()}\n`;
+                    });
+                    formattedContent += '\n';
+                });
+            }
+            
+            // Copy the formatted content
+            navigator.clipboard.writeText(formattedContent).then(() => {
+                const successMessage = element.querySelector('.copy-success');
+                successMessage.classList.add('show');
+                
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
         }
 
         function resetGuardrailsCalculator() {
@@ -1388,60 +2346,54 @@
             document.getElementById("guardrails-detailed-breakdown").style.display = "none";
         }
 
-        // Implement similar validation and error handling for other calculators
+        // Update the calculation function
         function calculateTextModelCost() {
-            if (!document.getElementById('modelSelect').value) {
-                alert("Please select a model first.");
-                return;
-            }
+            // Validate all inputs first
+            const inputs = ['textInputTokens', 'textOutputTokens', 'requestsPerMonth'];
+            let hasError = false;
+            
+            inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (!validateIntegerInput(input)) {
+                    hasError = true;
+                }
+            });
 
-            const inputTokens = parseFloat(document.getElementById('textInputTokens').value);
-            const outputTokens = parseFloat(document.getElementById('textOutputTokens').value);
-            const requestsPerMonth = parseFloat(document.getElementById('requestsPerMonth').value);
+            // Check if model is selected
+            const modelSelect = document.getElementById('modelSelect');
+            if (!modelSelect.value) {
+                modelSelect.classList.add('error');
+                hasError = true;
+            } else {
+                modelSelect.classList.remove('error');
+            }
+            
+            if (hasError) return;
+            
+            // Get values
+            const inputTokens = parseInt(document.getElementById('textInputTokens').value);
+            const outputTokens = parseInt(document.getElementById('textOutputTokens').value);
+            const requestsPerMonth = parseInt(document.getElementById('requestsPerMonth').value);
             const inputTokenPrice = parseFloat(document.getElementById('inputTokenPrice').value);
             const outputTokenPrice = parseFloat(document.getElementById('outputTokenPrice').value);
-
-            // Validation
-            let hasError = false;
-            const inputTokensEl = document.getElementById('textInputTokens');
-            const outputTokensEl = document.getElementById('textOutputTokens');
-            const requestsPerMonthEl = document.getElementById('requestsPerMonth');
-
-            if (isNaN(inputTokens) || inputTokens <= 0) {
-                inputTokensEl.classList.add('error');
-                document.getElementById('textInputTokensError').textContent = "Please enter a positive number";
-                hasError = true;
-            } else {
-                inputTokensEl.classList.remove('error');
-                document.getElementById('textInputTokensError').textContent = "";
-            }
-
-            if (isNaN(outputTokens) || outputTokens <= 0) {
-                outputTokensEl.classList.add('error');
-                document.getElementById('textOutputTokensError').textContent = "Please enter a positive number";
-                hasError = true;
-            } else {
-                outputTokensEl.classList.remove('error');
-                document.getElementById('textOutputTokensError').textContent = "";
-            }
-
-            if (isNaN(requestsPerMonth) || requestsPerMonth <= 0) {
-                requestsPerMonthEl.classList.add('error');
-                document.getElementById('requestsPerMonthError').textContent = "Please enter a positive number";
-                hasError = true;
-            } else {
-                requestsPerMonthEl.classList.remove('error');
-                document.getElementById('requestsPerMonthError').textContent = "";
-            }
-
-            if (hasError) return;
-
+            
+            // Calculate costs
             const totalInputCost = (inputTokenPrice / 1000) * inputTokens * requestsPerMonth;
             const totalOutputCost = (outputTokenPrice / 1000) * outputTokens * requestsPerMonth;
             const totalCost = totalInputCost + totalOutputCost;
 
             const selectedModel = document.getElementById('modelSelect').value;
-            document.getElementById('text-model-result').innerHTML = `
+            
+            // Update results with copy button
+            updateResults('text-model-result', `
+                <button class="copy-button" onclick="copyResults('text-model-result')" title="Copy results">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="copy-success">Copied!</div>
+                <div class="result-item">
+                    <span>Selected Model</span>
+                    <span>${selectedModel}</span>
+                </div>
                 <div class="result-item">
                     <span>Monthly Input Token Cost</span>
                     <span>${totalInputCost.toFixed(4)} USD</span>
@@ -1454,19 +2406,35 @@
                     <span>Total Monthly Bedrock Cost</span>
                     <span>${totalCost.toFixed(4)} USD</span>
                 </div>
-            `;
+            `);
 
-            document.getElementById('text-model-result-details').innerHTML = `
+            // Update detailed breakdown with copy button
+            updateResults('text-model-result-details', `
+                <button class="copy-button" onclick="copyResults('text-model-result-details')" title="Copy details">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="copy-success">Copied!</div>
                 <div class="detailed-step">
-                    <h3>Cost Calculation Details</h3>
-                    <p>Selected Model: ${selectedModel}</p>
-                    <p>Monthly Input Token Cost Calculation: (${inputTokenPrice} / 1000) × ${inputTokens} × ${requestsPerMonth} = ${totalInputCost.toFixed(4)} USD</p>
-                    <p>Monthly Output Token Cost Calculation: (${outputTokenPrice} / 1000) × ${outputTokens} × ${requestsPerMonth} = ${totalOutputCost.toFixed(4)} USD</p>
-                    <p>Total Monthly Bedrock Cost: ${totalInputCost.toFixed(4)} USD + ${totalOutputCost.toFixed(4)} USD = ${totalCost.toFixed(4)} USD</p>
+                    <h3>Model Details</h3>
+                    <p>Model: ${selectedModel}</p>
+                    <p>Input Price: $${inputTokenPrice}/1000 tokens</p>
+                    <p>Output Price: $${outputTokenPrice}/1000 tokens</p>
                 </div>
-            `;
+                <div class="detailed-step">
+                    <h3>Token Calculations</h3>
+                    <p>Input: ${inputTokens} tokens × ${requestsPerMonth} requests = ${inputTokens * requestsPerMonth} tokens</p>
+                    <p>Output: ${outputTokens} tokens × ${requestsPerMonth} requests = ${outputTokens * requestsPerMonth} tokens</p>
+                </div>
+                <div class="detailed-step">
+                    <h3>Cost Breakdown</h3>
+                    <p>Input Cost: (${inputTokenPrice}/1000) × ${inputTokens * requestsPerMonth} = ${totalInputCost.toFixed(4)} USD</p>
+                    <p>Output Cost: (${outputTokenPrice}/1000) × ${outputTokens * requestsPerMonth} = ${totalOutputCost.toFixed(4)} USD</p>
+                    <p>Total: ${totalInputCost.toFixed(4)} + ${totalOutputCost.toFixed(4)} = ${totalCost.toFixed(4)} USD</p>
+                </div>
+            `);
         }
 
+        // Update the reset function to clear error states
         function resetTextModelCalculator() {
             document.getElementById('regionSelect').selectedIndex = 0;
             document.getElementById('providerSelect').innerHTML = '<option value="">Select Provider</option>';
@@ -1493,40 +2461,45 @@
             const embedInputValue = parseFloat(document.getElementById('embedInputValue').value);
 
             let embedTokenPrice;
+            let modelName;
 
-            // Set embedTokenPrice based on modelType
+            // Set embedTokenPrice and modelName based on modelType
             if (modelType === "amzonEv1") {
-                embedTokenPrice = 0.0001; // Amazon Titan Text Embedding price
+                embedTokenPrice = 0.0001;
+                modelName = "Amazon Titan Text Embedding v1";
             } else if (modelType === "amzonEv2") {
-                embedTokenPrice = 0.00002; // Amazon Titan Text Embedding V2 price
+                embedTokenPrice = 0.00002;
+                modelName = "Amazon Titan Text Embedding v2";
             } else if (modelType === "CoherePlain") {
-                embedTokenPrice = 0.0001; // Cohere Embed English price
+                embedTokenPrice = 0.0001;
+                modelName = "Cohere Embed English";
             } else if (modelType === "CohereMultiLingual") {
-                embedTokenPrice = 0.0001; // Cohere Embed Multilingual price
-            } else {
-                alert("Invalid model type selected.");
-                return;
+                embedTokenPrice = 0.0001;
+                modelName = "Cohere Embed Multilingual";
             }
 
             let totalEmbedCost;
-            let calculationDetails = '';
+            let totalTokens;
 
             if (embedType === 'gb') {
-                const totalTokensFromGB = embedInputValue * 161000000; 
-                totalEmbedCost = (embedTokenPrice / 1000) * totalTokensFromGB;
-                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${totalTokensFromGB} tokens = ${totalEmbedCost.toFixed(4)} USD`;
+                totalTokens = embedInputValue * 161000000;
+                totalEmbedCost = (embedTokenPrice / 1000) * totalTokens;
             } else if (embedType === 'millionTokens') {
-                totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue * 1000000; 
-                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} million tokens = ${totalEmbedCost.toFixed(4)} USD`;
+                totalTokens = embedInputValue * 1000000;
+                totalEmbedCost = (embedTokenPrice / 1000) * totalTokens;
             } else if (embedType === 'tokens') {
-                totalEmbedCost = (embedTokenPrice / 1000) * embedInputValue;
-                calculationDetails = `Calculation: (${embedTokenPrice} / 1000) × ${embedInputValue} tokens = ${totalEmbedCost.toFixed(4)} USD`;
+                totalTokens = embedInputValue;
+                totalEmbedCost = (embedTokenPrice / 1000) * totalTokens;
             }
 
             document.getElementById('embedding-result').innerHTML = `
+                <button class="copy-button" onclick="copyResults('embedding-result')" title="Copy results">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="copy-success">Copied!</div>
                 <div class="result-item">
                     <span>Selected Model</span>
-                    <span>${document.getElementById('modelType').options[document.getElementById('modelType').selectedIndex].text}</span>
+                    <span>${modelName}</span>
                 </div>
                 <div class="result-item">
                     <span>Total Monthly Embedding Cost</span>
@@ -1535,9 +2508,30 @@
             `;
 
             document.getElementById('embedding-result-details').innerHTML = `
+                <button class="copy-button" onclick="copyResults('embedding-result-details')" title="Copy details">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <div class="copy-success">Copied!</div>
                 <div class="detailed-step">
-                    <h3>Cost Calculation Details</h3>
-                    <p>${calculationDetails}</p>
+                    <h3>Model Details</h3>
+                    <p>Model: ${modelName}</p>
+                    <p>Price: $${embedTokenPrice}/1000 tokens</p>
+                </div>
+                <div class="detailed-step">
+                    <h3>Input Details</h3>
+                    <p>Type: ${embedType === 'gb' ? 'Data Size' : embedType === 'millionTokens' ? 'Million Tokens' : 'Tokens'}</p>
+                    <p>Value: ${embedInputValue} ${embedType === 'gb' ? 'GB' : embedType === 'millionTokens' ? 'Million' : ''}</p>
+                </div>
+                <div class="detailed-step">
+                    <h3>Token Calculation</h3>
+                    <p>${embedType === 'gb' ? `Converting GB to Tokens: ${embedInputValue} GB × 161,000,000 tokens/GB = ${totalTokens.toLocaleString()} tokens` :
+                      embedType === 'millionTokens' ? `Converting Million Tokens to Tokens: ${embedInputValue} million × 1,000,000 = ${totalTokens.toLocaleString()} tokens` :
+                      `Total Tokens: ${totalTokens.toLocaleString()}`}</p>
+                </div>
+                <div class="detailed-step">
+                    <h3>Cost Calculation</h3>
+                    <p>Token Price: $${embedTokenPrice} per 1000 tokens</p>
+                    <p>Total Cost: (${embedTokenPrice} / 1000) × ${totalTokens.toLocaleString()} tokens = ${totalEmbedCost.toFixed(4)} USD</p>
                 </div>
             `;
         }
@@ -1554,19 +2548,41 @@
         window.onload = function() {
             initializeDropdowns();
         };
+
+        // Theme switching functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeToggle = document.querySelector('.theme-toggle i');
+            
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                themeToggle.classList.remove('fa-sun');
+                themeToggle.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.classList.remove('fa-moon');
+                themeToggle.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const html = document.documentElement;
+            const themeToggle = document.querySelector('.theme-toggle i');
+            
+            html.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'dark') {
+                themeToggle.classList.remove('fa-moon');
+                themeToggle.classList.add('fa-sun');
+            }
+        });
     </script>
 
     <!-- <div style="text-align: center; margin-top: 20px; color: #e5eceb; padding: 10px;">
         <p>Developed by <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" style="color: #e5eceb;">Aditya</a>. Please verify cost estimates prior to implementation.</p>
     </div> -->
-
-     <footer style="text-align: center; padding: 5px; background-color: #222; color: #e5eceb; width: 100%; position: fixed; bottom: 0; left: 0; font-size: 12px;">
-        <p style="margin: 0;">
-            Developed by 
-            <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" style="color: #e5eceb; text-decoration: none;">
-                Aditya
-            </a>. Please verify cost estimates prior to implementation.
-        </p>
-    </footer>
 </body>
 </html>
