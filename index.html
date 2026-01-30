@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Bedrock Cost Calculator</title>
+    
+    <!-- External Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="./css/variables.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="tab-buttons">
+            <div class="tab-button active" onclick="switchTab('text-model')">
+                <i class="fas fa-calculator"></i>
+                <span>Text Model Calculator</span>
+            </div>
+            <div class="tab-button" onclick="switchTab('embedding')">
+                <i class="fas fa-code"></i>
+                <span>Embedding Model Calculator</span>
+            </div>
+            <div class="tab-button" onclick="switchTab('guardrails')">
+                <i class="fas fa-shield-alt"></i>
+                <span>Guardrails Calculator</span>
+            </div>
+            <div class="tab-button" onclick="switchTab('token-tester')">
+                <i class="fas fa-vial"></i>
+                <span>Token API Tester</span>
+            </div>
+        </div>
+
+        <!-- Text Model Cost Calculator -->
+        <div id="text-model-tab" class="tab-content active">
+            <h1 class="calculator-title">
+                <i class="fas fa-calculator"></i>
+                Text Based LLM Model On-Demand Cost Calculator
+            </h1>
+
+            <div class="inputs-container text-model-inputs">
+                <!-- First row: Dropdowns -->
+                <div class="dropdown-row">
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-globe"></i>
+                            Region
+                        </label>
+                        <select id="regionSelect" onchange="updateProviders()">
+                            <option value="">Select Region</option>
+                        </select>
+                        <div class="error">Please select a region</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-server"></i>
+                            Provider
+                        </label>
+                        <select id="providerSelect" onchange="updateModels()" disabled>
+                            <option value="">Select Provider</option>
+                        </select>
+                        <div class="error">Please select a provider</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-cube"></i>
+                            Model
+                        </label>
+                        <select id="modelSelect" onchange="updatePricing()" disabled>
+                            <option value="">Select Model</option>
+                        </select>
+                        <div class="error">Please select a model</div>
+                    </div>
+                </div>
+
+                <!-- Second row: Input boxes -->
+                <div class="input-row">
+                    <input type="hidden" id="inputTokenPrice">
+                    <input type="hidden" id="outputTokenPrice">
+
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-keyboard"></i>
+                            Input Tokens
+                        </label>
+                        <input type="number" 
+                               id="textInputTokens" 
+                               placeholder="Enter input tokens" 
+                               min="1" 
+                               step="1"
+                               oninput="validateIntegerInput(this)"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <div class="error" id="textInputTokensError"></div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-keyboard"></i>
+                            Output Tokens
+                        </label>
+                        <input type="number" 
+                               id="textOutputTokens" 
+                               placeholder="Enter output tokens" 
+                               min="1" 
+                               step="1"
+                               oninput="validateIntegerInput(this)"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <div class="error" id="textOutputTokensError"></div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-sync"></i>
+                            Requests per Month
+                        </label>
+                        <input type="number" 
+                               id="requestsPerMonth" 
+                               placeholder="Enter requests per month" 
+                               min="1" 
+                               step="1"
+                               oninput="validateIntegerInput(this)"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <div class="error" id="requestsPerMonthError"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateTextModelCost()">
+                    <i class="fas fa-calculator"></i>
+                    Calculate Cost
+                </button>
+                <button class="btn btn-reset" onclick="resetTextModelCalculator()">
+                    <i class="fas fa-redo"></i>
+                    Reset
+                </button>
+            </div>
+
+            <div class="results-details-container">
+                <div id="text-model-result" class="results-container"></div>
+                <div id="text-model-result-details" class="detailed-breakdown"></div>
+            </div>
+        </div>
+
+        <!-- Embedding Model Cost Calculator -->
+        <div id="embedding-tab" class="tab-content">
+            <h1 class="calculator-title">Embedding Based LLM Model On-Demand Cost Calculator</h1>
+
+            <div class="inputs-container embedding-inputs">
+                <div class="embedding-row">
+                    <div class="input-group">
+                        <label>Select Embedding Model</label>
+                        <select id="modelType">
+                            <option value="amzonEv1">Amazon Titan Text Embedding v1</option>
+                            <option value="amzonEv2">Amazon Titan Text Embedding v2</option>
+                            <option value="CoherePlain">Cohere Embed English</option>
+                            <option value="CohereMultiLingual">Cohere Embed Multilingual</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Select Input Type</label>
+                        <select id="embedType">
+                            <option value="gb">Total Data Size in GB</option>
+                            <option value="millionTokens">Total Number of Tokens in Million</option>
+                            <option value="tokens">Total Number of Tokens</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Enter Value</label>
+                        <input type="text" id="embedInputValue" placeholder="Enter value based on selection" oninput="validateInput(this)">
+                        <div class="error" id="embedInputValueError"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateEmbeddingCost()">Calculate Embedding Model Cost</button>
+                <button class="btn btn-reset" onclick="resetEmbeddingCalculator()">Reset</button>
+            </div>
+
+            <div class="results-details-container">
+                <div id="embedding-result" class="results-container"></div>
+                <div id="embedding-result-details" class="detailed-breakdown"></div>
+            </div>
+        </div>
+
+        <!-- Guardrails Cost Calculator -->
+        <div id="guardrails-tab" class="tab-content">
+            <h1 class="calculator-title">Amazon Bedrock Guardrails On-Demand Cost Calculator</h1>
+            
+            <div class="inputs-container guardrails-inputs">
+                <div class="input-group">
+                    <label for="inputTokens">Input Tokens Per Request</label>
+                    <input type="number" id="inputTokens" placeholder="Enter input tokens" min="1">
+                    <div class="error">Please enter a positive integer</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="outputTokens">Output Tokens Per Request</label>
+                    <input type="number" id="outputTokens" placeholder="Enter output tokens" min="1">
+                    <div class="error">Please enter a positive integer</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="requests">Total Number of Requests Per Month</label>
+                    <input type="number" id="requests" placeholder="Enter requests per hour" min="1">
+                    <div class="error">Please enter a positive integer</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-calculate" onclick="calculateGuardrailsCost()">Calculate Cost</button>
+                <button class="btn btn-reset" onclick="resetGuardrailsCalculator()">Reset</button>
+            </div>
+
+            <div class="results-details-container">
+                <div id="guardrails-results" class="results-container"></div>
+                <div id="guardrails-detailed-breakdown" class="detailed-breakdown"></div>
+            </div>
+        </div>
+
+        <!-- Token API Tester -->
+        <div id="token-tester-tab" class="tab-content">
+            <h1 class="calculator-title">
+                <i class="fas fa-vial"></i>
+                Token API Tester
+            </h1>
+
+            <div class="inputs-container" style="padding: 1rem; margin: 0 1rem;">
+                <div class="input-group">
+                    <label>
+                        <i class="fas fa-keyboard"></i>
+                        Enter Text to Tokenize
+                    </label>
+                    <textarea 
+                        id="tokenTextInput" 
+                        placeholder="Enter text here to see how it gets tokenized..." 
+                        style="min-height: 120px; font-family: 'Courier New', monospace; resize: vertical; width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.375rem; background-color: var(--card-color); color: var(--text-color); font-size: var(--font-size-sm);"
+                    ></textarea>
+                    <div class="error" id="tokenTextInputError"></div>
+                </div>
+            </div>
+
+            <div class="button-group" style="display: flex; gap: 0.5rem; padding: 0 1rem;">
+                <button class="btn btn-calculate" onclick="callTokenAPI()">
+                    <i class="fas fa-paper-plane"></i>
+                    Tokenize Text
+                </button>
+                <button class="btn btn-reset" onclick="resetTokenTester()">
+                    <i class="fas fa-redo"></i>
+                    Reset
+                </button>
+            </div>
+
+            <div class="results-details-container" style="margin-top: 1rem;">
+                <div id="token-results" class="results-container" style="flex: 0 0 40%;">
+                    <h3 style="color: var(--primary-color); font-size: var(--font-size-base); margin-bottom: 0.75rem;">
+                        <i class="fas fa-chart-bar"></i>
+                        Token Summary
+                    </h3>
+                    <div id="token-summary"></div>
+                </div>
+                <div id="token-details" class="detailed-breakdown" style="flex: 0 0 55%;">
+                    <h3 style="color: var(--primary-color); font-size: var(--font-size-base); margin-bottom: 0.75rem;">
+                        <i class="fas fa-list"></i>
+                        Token Breakdown
+                    </h3>
+                    <div id="token-breakdown"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            Developed by 
+            <a href="https://www.cloudthat.com/resources/author/aditya-kumar/" target="_blank" rel="noopener noreferrer">
+                Aditya Kumar
+            </a>
+            <span class="footer-note">• Please verify cost estimates prior to implementation</span>
+        </p>
+    </footer>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Application Scripts -->
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+/* Component Styles */
+
+.calculator-container {
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--card-color);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 2rem);
+    padding: var(--container-padding);
+    gap: var(--grid-gap);
+}
+
+.tab-buttons {
+    display: flex;
+    background-color: var(--background-color);
+    padding: 0.25rem;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+    padding: var(--tab-button-padding);
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--text-color);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tab-button:hover {
+    background-color: var(--card-color);
+}
+
+.tab-button.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.tab-content {
+    flex: 1;
+    display: none;
+    padding: 1rem;
+    overflow-y: auto;
+    height: calc(100vh - 120px);
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.calculator-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0.25rem 0;
+    text-align: center;
+}
+
+.inputs-container {
+    margin-bottom: 0.1rem;
+}
+
+.button-group {
+    margin: var(--section-margin) 0;
+    gap: 0.1rem;
+    display: flex;
+}
+
+.results-details-container {
+    display: flex;
+    gap: var(--grid-gap);
+    flex: 1;
+    min-height: 0;
+    margin-top: var(--section-margin);
+}
+
+.results-container {
+    flex: 0 0 40%;
+    background: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    overflow-y: auto;
+    max-height: 100%;
+    position: relative;
+}
+
+.detailed-breakdown {
+    flex: 0 0 55%;
+    background: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 0.7rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    overflow-y: auto;
+    max-height: 100%;
+    position: relative;
+}
+
+.detailed-step {
+    background: var(--background-color);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.detailed-step:last-child {
+    margin-bottom: 0;
+}
+
+.detailed-step h3,
+.detailed-step h4 {
+    color: var(--primary-color);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.detailed-step p {
+    font-size: var(--font-size-sm);
+    line-height: 1.3;
+    margin: 0.125rem 0;
+    color: var(--text-color);
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.375rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
+    margin-bottom: 0.25rem;
+}
+
+.input-group {
+    margin-bottom: var(--input-group-margin);
+}
+
+.input-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: var(--card-color);
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+    transition: var(--transition);
+    margin: 0.25rem 0;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input-group .error {
+    margin-top: 0.25rem;
+    font-size: var(--font-size-sm);
+    color: var(--error-color);
+    min-height: 1rem;
+}
+
+.input-group input.error,
+.input-group select.error {
+    border-color: var(--error-color);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.btn {
+    flex: 1;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn-calculate {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-calculate:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-1px);
+}
+
+.btn-reset {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn-reset:hover {
+    background-color: var(--border-color);
+    transform: translateY(-1px);
+}
+
+.copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--primary-color);
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.copy-button:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.copy-success {
+    position: absolute;
+    top: 0.5rem;
+    right: 3rem;
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.375rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: var(--font-size-sm);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.copy-success.show {
+    opacity: 1;
+}
+
+/* Footer styles */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--card-color);
+    color: var(--text-color);
+    padding: 0.375rem;
+    font-size: var(--font-size-sm);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    z-index: 999;
+}
+
+footer p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    line-height: 1;
+}
+
+footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    padding: 0 0.25rem;
+}
+
+.footer-note {
+    color: var(--text-color);
+    opacity: 0.8;
+    padding-left: 0.25rem;
+}
+
+/* Theme toggle */
+.theme-toggle {
+    position: fixed;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background-color: var(--card-color);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-lg);
+}
+
+.theme-toggle i {
+    font-size: var(--font-size-base);
+    color: var(--primary-color);
+}
+
+/* Calculator-specific layouts */
+.text-model-inputs,
+.embedding-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin: 0 1rem;
+}
+
+.dropdown-row,
+.input-row,
+.embedding-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.dropdown-row .input-group,
+.input-row .input-group,
+.embedding-row .input-group {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 0.5rem;
+}
+
+.guardrails-inputs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem;
+    margin: 0 1rem;
+}
+
+.guardrails-inputs .input-group {
+    flex: 1;
+    margin-bottom: 0;
+    min-width: 200px;
+}
+
+/* Token Tester specific styles */
+#tokenTextInput {
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+#tokenTextInput:focus {
+    outline: none;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+#tokenTextInput.error {
+    border-color: var(--error-color) !important;
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+#token-response pre {
+    transition: color 0.3s ease;
+}
