@@ -1,6 +1,6 @@
 /* Base Styles */
 * {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 html {
@@ -8,8 +8,9 @@ html {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background: var(--gradient-background);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--background-color);
+    background-image: var(--gradient-mesh);
     color: var(--text-color);
     line-height: 1.6;
     font-weight: 400;
@@ -17,8 +18,23 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 1.25rem 0.5rem;
+    padding: 1rem 0.5rem 2.5rem 0.5rem;
     margin: 0;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-background);
+    opacity: 0.05;
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* Typography enhancements */
@@ -68,12 +84,14 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"]:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), var(--shadow-glow);
+    transform: translateY(-1px);
 }
 
 input[type="number"].error {
     border-color: var(--error-color);
     background-color: rgba(239, 68, 68, 0.05);
+    animation: shake 0.5s var(--easing-smooth);
 }
 
 /* Error styles */
@@ -81,4 +99,120 @@ input[type="number"].error {
     color: var(--error-color);
     font-size: 0.875rem;
     margin-top: 0.5rem;
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-color);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: 10px;
+    border: 2px solid var(--background-color);
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-secondary);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--background-color);
+}
+
+/* Selection styling */
+::selection {
+    background: var(--primary-color);
+    color: white;
+}
+
+::-moz-selection {
+    background: var(--primary-color);
+    color: white;
+}
+
+
+/* Decorative Elements */
+.calculator-container .tab-content::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: float 6s ease-in-out infinite;
+}
+
+.calculator-container .tab-content::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+/* Enhanced focus states */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Smooth page transitions */
+.tab-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Tooltip styles for better UX */
+[title] {
+    position: relative;
+    cursor: help;
+}
+
+/* Enhanced disabled states */
+input:disabled,
+select:disabled,
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}
+
+/* Better placeholder styling */
+::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+    font-weight: 400;
+}
+
+::-webkit-input-placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+    font-weight: 400;
+}
+
+::-moz-placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+    font-weight: 400;
 }

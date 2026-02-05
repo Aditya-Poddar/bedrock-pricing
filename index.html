@@ -6,8 +6,10 @@
     <title>Amazon Bedrock Cost Calculator</title>
     
     <!-- External Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Application Styles -->
     <link rel="stylesheet" href="./css/variables.css">
@@ -21,19 +23,19 @@
         <div class="tab-buttons">
             <div class="tab-button active" onclick="switchTab('text-model')">
                 <i class="fas fa-calculator"></i>
-                <span>Text Model Calculator</span>
+                <span>Text Model</span>
             </div>
             <div class="tab-button" onclick="switchTab('embedding')">
                 <i class="fas fa-code"></i>
-                <span>Embedding Model Calculator</span>
+                <span>Embedding</span>
             </div>
             <div class="tab-button" onclick="switchTab('guardrails')">
                 <i class="fas fa-shield-alt"></i>
-                <span>Guardrails Calculator</span>
+                <span>Guardrails</span>
             </div>
             <div class="tab-button" onclick="switchTab('token-tester')">
                 <i class="fas fa-vial"></i>
-                <span>Token Calculator</span>
+                <span>Token Tester</span>
             </div>
         </div>
 
@@ -41,7 +43,7 @@
         <div id="text-model-tab" class="tab-content active">
             <h1 class="calculator-title">
                 <i class="fas fa-calculator"></i>
-                Text Based LLM Model On-Demand Cost Calculator
+                <span>Text Model Cost Calculator</span>
             </h1>
 
             <div class="inputs-container text-model-inputs">
@@ -152,7 +154,10 @@
 
         <!-- Embedding Model Cost Calculator -->
         <div id="embedding-tab" class="tab-content">
-            <h1 class="calculator-title">Embedding Based LLM Model On-Demand Cost Calculator</h1>
+            <h1 class="calculator-title">
+                <i class="fas fa-code"></i>
+                <span>Embedding Model Cost Calculator</span>
+            </h1>
 
             <div class="inputs-container embedding-inputs">
                 <div class="embedding-row">
@@ -196,7 +201,10 @@
 
         <!-- Guardrails Cost Calculator -->
         <div id="guardrails-tab" class="tab-content">
-            <h1 class="calculator-title">Amazon Bedrock Guardrails On-Demand Cost Calculator</h1>
+            <h1 class="calculator-title">
+                <i class="fas fa-shield-alt"></i>
+                <span>Guardrails Cost Calculator</span>
+            </h1>
             
             <div class="inputs-container guardrails-inputs">
                 <div class="input-group">
@@ -233,7 +241,7 @@
         <div id="token-tester-tab" class="tab-content">
             <h1 class="calculator-title">
                 <i class="fas fa-vial"></i>
-                Token Calcualtion
+                <span>Token Calculator</span>
             </h1>
 
             <div class="inputs-container" style="padding: 1rem; margin: 0 1rem;">

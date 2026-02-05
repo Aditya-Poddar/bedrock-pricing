@@ -1,0 +1,97 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Kiro AI Files
+.kiro/
+
+# Node.js (if using npm/node tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python (if using Python server)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Logs
+logs/
+*.log
+
+# Backup Files
+*.bak
+*.backup
+backup*.html
+*_backup.*
+*.old
+
+# Temporary Files
+*.tmp
+*.temp
+~*
+
+# Build and Distribution
+dist/
+build/
+*.min.js
+*.min.css
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Documentation (temporary)
+*_IMPROVEMENTS.md
+*_FIX.md
+*_OPTIMIZATION.md
+LAYOUT_*.md
+SPACE_*.md
+COMPACT_*.md
+
+# Test Files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Server Scripts
+*.bat
+*.sh
+
+# Misc
+*.zip
+*.tar.gz
+*.rar
