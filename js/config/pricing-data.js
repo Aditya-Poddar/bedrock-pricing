@@ -344,6 +344,10 @@ export const pricingData = {
                         "NVIDIA Nemotron Nano 2 VL": {
                         "Cost per 1000 input tokens": "$0.00020",
                         "Cost per 1000 output tokens": "$0.00060"
+                        },
+                        "NVIDIA Nemotron 3 Nano 30B A3B": {
+                        "Cost per 1000 input tokens": "$0.00006",
+                        "Cost per 1000 output tokens": "$0.00024"
                         }
                     }
                     },
@@ -720,6 +724,10 @@ export const pricingData = {
                         "NVIDIA Nemotron Nano 2 VL": {
                         "Cost per 1000 input tokens": "$0.00020",
                         "Cost per 1000 output tokens": "$0.00060"
+                        },
+                        "NVIDIA Nemotron 3 Nano 30B A3B": {
+                        "Cost per 1000 input tokens": "$0.00006",
+                        "Cost per 1000 output tokens": "$0.00024"
                         }
                     }
                     },
@@ -945,6 +953,10 @@ export const pricingData = {
                         "NVIDIA Nemotron Nano 2 VL": {
                         "Cost per 1000 input tokens": "$0.00024",
                         "Cost per 1000 output tokens": "$0.00071"
+                        },
+                        "NVIDIA Nemotron 3 Nano 30B A3B": {
+                        "Cost per 1000 input tokens": "$0.00007",
+                        "Cost per 1000 output tokens": "$0.00028"
                         }
                     }
                     },
