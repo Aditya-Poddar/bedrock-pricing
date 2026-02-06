@@ -81,6 +81,14 @@ export const pricingData = {
                     },
                     "Anthropic": {
                     "Models": {
+                        "Claude Opus 4.6": {
+                            "Cost per 1000 input tokens": "$0.005",
+                            "Cost per 1000 output tokens": "$0.025"
+                        },
+                        "Claude Opus 4.6 - Long Context": {
+                            "Cost per 1000 input tokens": "$0.010",
+                            "Cost per 1000 output tokens": "$0.037"
+                        },
                         "Claude Opus 4.5": {
                             "Cost per 1000 input tokens": "$0.005",
                             "Cost per 1000 output tokens": "$0.025"
@@ -421,6 +429,14 @@ export const pricingData = {
                     },
                     "Anthropic": {
                     "Models": {
+                        "Claude Opus 4.6": {
+                            "Cost per 1000 input tokens": "$0.005",
+                            "Cost per 1000 output tokens": "$0.025"
+                        },
+                        "Claude Opus 4.6 - Long Context": {
+                            "Cost per 1000 input tokens": "$0.010",
+                            "Cost per 1000 output tokens": "$0.037"
+                        },
                         "Claude Opus 4.5": {
                             "Cost per 1000 input tokens": "$0.005",
                             "Cost per 1000 output tokens": "$0.025"
@@ -794,6 +810,14 @@ export const pricingData = {
                     },
                     "Anthropic": {
                     "Models": {
+                        "Claude Opus 4.6": {
+                            "Cost per 1000 input tokens": "$0.005",
+                            "Cost per 1000 output tokens": "$0.025"
+                        },
+                        "Claude Opus 4.6 - Long Context": {
+                            "Cost per 1000 input tokens": "$0.010",
+                            "Cost per 1000 output tokens": "$0.037"
+                        },
                         "Claude Opus 4.5": {
                             "Cost per 1000 input tokens": "$0.005",
                             "Cost per 1000 output tokens": "$0.025"
